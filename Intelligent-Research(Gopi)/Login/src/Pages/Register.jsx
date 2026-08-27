@@ -127,11 +127,11 @@ function Register() {
 
                                 <div className="form-group"  >
 
-                                    <label htmlFor="organ   ">Organization   </label>
+                                    <label htmlFor="organization"   >Organization   </label>
 
-                                    <input type="text" id="organ" placeholder="University, company ,institution " 
-                                    name="organ"
-                                    value={formData.organ}
+                                    <input type="text" id="organization  " placeholder="University, company ,institution " 
+                                    name="organization"
+                                    value={formData.organization}
                                     onChange={handleChange}
                                     
                                     />

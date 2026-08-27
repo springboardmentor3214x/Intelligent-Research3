@@ -5,6 +5,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error,setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = (event) => {
   event.preventDefault();
@@ -22,8 +23,15 @@ function Login() {
     return;
   }
 
+    setLoading(true);
+
   console.log("Email:", email);
   console.log("Password:", password);
+
+    setTimeout(() => {
+    setLoading(false);
+    //setError("Invalid email or password.");
+  }, 2000);
 };
 
   return (
@@ -96,8 +104,10 @@ function Login() {
 
 
           <button type="submit"
-          className="login-button">
-            Sign In
+          className="login-button"
+          disabled={loading}
+          >
+           {loading ? "Signing in..." : "Sign In"}
           </button>
 
           </form>

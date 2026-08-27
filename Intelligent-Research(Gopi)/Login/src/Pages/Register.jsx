@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 function Register() {
+        document.title = "Register | Research Intelligence Platform";
     /* const [name, setName] = useState("");
        const [email, setEmail] = useState("");     instead we can follow a state object that holds all registration information
        const [phone, setPhone] = useState();
@@ -31,8 +33,14 @@ function Register() {
         });
     };
 
-    /*checking purpose only*/
-    console.log(formData);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        console.log(formData);
+    };
+
+    /*checking purpose only
+    console.log(formData);*/
     return (
         <>
 
@@ -66,7 +74,7 @@ function Register() {
 
                         {/*form content starts here */}
                         <form className="register-form"
-                            onSubmit={(event) => event.preventDefault()}
+                            onSubmit={handleSubmit}
 
                         >
                             <div className="form-section">
@@ -78,8 +86,8 @@ function Register() {
                                     {/*input area starts */}
 
                                     <input type="text" id="name" placeholder="Enter your full name"
-                                        name="name"
-                                   
+                                        name="name" required
+
                                         value={formData.name}
                                         onChange={handleChange}
 
@@ -94,11 +102,11 @@ function Register() {
                                 <div className="form-group">
                                     <label htmlFor="email           ">Email address    </label>
 
-                                    <input type="email  " id="email" placeholder="you@mail.com" 
-                                    name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    
+                                    <input type="email  " id="email" placeholder="you@mail.com"
+                                        name="email" required
+                                        value={formData.email}
+                                        onChange={handleChange}
+
                                     />
 
                                 </div>
@@ -106,12 +114,14 @@ function Register() {
                                 {/*phone */}
                                 <div className="form-group" >
                                     <label htmlFor="phone"   >Phone          </label>
-                                    <input type="tel " id="phone" placeholder="enter 10 digit phone number   " 
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    
-                                    
+                                    <input type="tel " id="phone" placeholder="enter 10 digit phone number   "
+                                        name="phone" required
+                                        value={formData.phone}
+                                        onChange={handleChange}
+                                        pattern="[0-9]{10}"
+                                        title="Phone number must contain exactly 10 digits"
+
+
                                     />
                                 </div>
                             </div>
@@ -129,11 +139,11 @@ function Register() {
 
                                     <label htmlFor="organization"   >Organization   </label>
 
-                                    <input type="text" id="organization  " placeholder="University, company ,institution " 
-                                    name="organization"
-                                    value={formData.organization}
-                                    onChange={handleChange}
-                                    
+                                    <input type="text" id="organization  " placeholder="University, company ,institution "
+                                        name="organization" required
+                                        value={formData.organization}
+                                        onChange={handleChange}
+
                                     />
                                 </div>
 
@@ -143,12 +153,12 @@ function Register() {
                                 <div className="form-group"      >
 
                                     <label htmlFor="designation">Designation</label>
-                                    <input type="text" id="designation" placeholder="your current role" 
-                                    name="designation"
-                                    value={formData.designation}
-                                    onChange={handleChange}
-                                    
-                                    
+                                    <input type="text" id="designation" placeholder="your current role"
+                                        name="designation" required
+                                        value={formData.designation}
+                                        onChange={handleChange}
+
+
                                     />
 
                                 </div>
@@ -160,11 +170,11 @@ function Register() {
                                 <div className="form-group">
 
                                     <label htmlFor="country">Country</label>
-                                    <input type="text" id="country" placeholder="enter your country" 
-                                    name="country"
-                                    value={formData.country}
-                                    onChange={handleChange}
-                                    
+                                    <input type="text" id="country" placeholder="enter your country"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleChange}
+
                                     />
 
                                 </div>{/*end of professional */}
@@ -178,13 +188,13 @@ function Register() {
                                 <div className="form-group">
 
                                     <label htmlFor="role">Account role</label>
-                                    <select id="role"name="role" value={formData.role} onChange={handleChange} >
+                                    <select id="role" name="role" value={formData.role} onChange={handleChange} required   >
                                         <option value="">select your role</option>
                                         <option value="researcher">Researcher</option>
                                         <option value="startup-founder">Startup Founder</option>
                                         <option value="innovation-manager">Innovation Manager</option>
 
-                                        
+
                                     </select>
                                 </div>
 
@@ -225,9 +235,12 @@ function Register() {
                                         id="password"
                                         type="password"
                                         placeholder="Create a secure password"
-                                        name="password"
+                                        name="password" required
                                         value={formData.password}
                                         onChange={handleChange}
+
+                                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}"
+                                        title="Password must be at least 8 characters and contain uppercase, lowercase, number, and special character"
 
 
                                     />
@@ -271,7 +284,9 @@ function Register() {
 
                         <p className="login-text">
                             Already have an account?
-                            <span className="login-link"> Sign in</span>
+                            <Link to="/login" className="login-link">
+                                Sign in
+                            </Link>
                         </p>
                     </section>
 

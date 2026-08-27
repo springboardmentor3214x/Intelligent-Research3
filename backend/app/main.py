@@ -1,10 +1,24 @@
 from fastapi import FastAPI
 
+from app.routers.auth import router as auth_router
+from app.routers.users import router as users_router
+from app.routers.research_profile import router as research_profile_router
+from app.routers.publications import router as publications_router
+from app.routers.patents import router as patents_router
+
+
 app = FastAPI(
     title="Research Funding & Innovation Intelligence Platform",
     version="0.1.0",
-    description="Foundation for the user authentication and RBAC module.",
+    description="Research Funding & Innovation Intelligence Platform API",
 )
+
+
+app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(research_profile_router)
+app.include_router(publications_router)
+app.include_router(patents_router)
 
 
 @app.get("/")

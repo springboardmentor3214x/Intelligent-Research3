@@ -374,3 +374,278 @@ body {
     font-size: 26px;
   }
 }
+
+/* styling for registration page
+*/
+
+.register-page {
+  min-height: 100vh;
+  padding: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f7f8f5;
+}
+
+
+/* styling the main/inside container which is the form
+
+*/
+
+.register-container {
+  width: 100%;
+  max-width: 1180px;
+
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e7e3;
+  border-radius: 12px;
+
+  overflow: hidden;
+
+  box-shadow: 0 12px 35px rgba(31, 41, 51, 0.07);
+}
+
+/*styling the left side 
+*/
+.register-intro {
+  padding: 56px 48px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: #eef2ef;
+}
+
+.platform-label {
+  margin: 0 0 18px;
+
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color:#52665a;
+}
+
+.register-intro h1 {
+  margin: 0;
+
+  font-size: 44px;
+  line-height: 1.12;
+  font-weight: 650;
+
+  letter-spacing: -1px;
+
+  color: #24312a;
+}
+
+.intro-description {
+  max-width: 470px;
+
+  margin: 24px 0 0;
+
+  font-size: 15px;
+  line-height: 1.7;
+
+  color: #5d6962;
+}
+
+.register-card {
+  padding: 45px 52px;
+  background: #ffffff;
+}
+
+.register-head h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 650;
+  color: #24312a;
+}
+
+.register-head p {
+  margin: 8px 0 28px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #66716b;
+}
+
+.form-section {
+  margin-bottom: 28px;
+}
+
+.form-section h3 {
+  margin: 0 0 16px;
+
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 650;
+
+  color: #34423a;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #3f4c44;
+}
+
+/* highlight the input section when clicking*/
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+
+  border: 1px solid #d7ddd8;
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  color: #27332c;
+  background: #ffffff;
+
+  outline: none;
+}
+
+/* style the select drop down*/
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+
+  border: 1px solid #d7ddd8;
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  color: #27332c;
+  background: #ffffff;
+
+  outline: none;
+}
+.form-group select:focus {
+  border-color: #718579;
+
+  box-shadow: 0 0 0 3px rgba(113, 133, 121, 0.12);
+}
+
+/*create button style*/
+.register-button {
+  width: 100%;
+  padding: 13px 20px;
+
+  border: none;
+  border-radius: 7px;
+
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+
+  color: #ffffff;
+  background: #3f5f4d;
+
+  cursor: pointer;
+}
+
+.register-button:hover {
+  background: #324d3d;
+}
+
+.register-button:active {
+  transform: translateY(1px);
+}
+
+/* login*/
+.login-text {
+  margin: 22px 0 0;
+  text-align: center;
+
+  font-size: 14px;
+  color: #6b756f;
+}
+
+.login-link {
+  font-weight: 600;
+  color: #3f5f4d;
+
+  cursor: pointer;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/*responsiveness for tablet*/
+@media (max-width: 900px) {
+  .register-page {
+    padding: 24px;
+  }
+
+  .register-container {
+    grid-template-columns: 1fr;
+    max-width: 720px;
+  }
+
+  .register-intro {
+    padding: 40px;
+  }
+
+  .register-card {
+    padding: 40px;
+  }
+}
+
+/* for mobile*/
+@media (max-width: 600px) {
+  .register-page {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .register-container {
+    border-radius: 8px;
+  }
+
+  .register-intro {
+    padding: 32px 24px;
+  }
+
+  .register-intro h1 {
+    font-size: 34px;
+  }
+
+  .register-card {
+    padding: 32px 24px;
+  }
+
+  .register-header h2 {
+    font-size: 24px;
+  }
+
+    .form-section {
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 11px 12px;
+  }
+}

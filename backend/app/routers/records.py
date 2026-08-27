@@ -19,7 +19,10 @@ def list_publications(current_user: User = Depends(get_current_user), db: Sessio
 @publications.post("", response_model=PublicationOut, status_code=status.HTTP_201_CREATED)
 def create_publication(payload: PublicationCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     profile = get_or_create_profile(db, current_user)
-    record = Publication(profile_id=profile.id, **payload.model_dump(mode="json"))
+    data = payload.model_dump()
+    if data.get("publication_link") is not None:
+        data["publication_link"] = str(data["publication_link"])
+    record = Publication(profile_id=profile.id, **data)
     db.add(record); db.commit(); db.refresh(record); return record
 
 @publications.get("/{record_id}", response_model=PublicationOut)
@@ -29,7 +32,10 @@ def get_publication(record_id: int, current_user: User = Depends(get_current_use
 @publications.put("/{record_id}", response_model=PublicationOut)
 def update_publication(record_id: int, payload: PublicationUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     record = get_owned_record(db, Publication, record_id, get_or_create_profile(db, current_user).id)
-    for field, value in payload.model_dump(exclude_unset=True, mode="json").items(): setattr(record, field, value)
+    data = payload.model_dump(exclude_unset=True)
+    if data.get("publication_link") is not None:
+        data["publication_link"] = str(data["publication_link"])
+    for field, value in data.items(): setattr(record, field, value)
     db.commit(); db.refresh(record); return record
 
 @publications.delete("/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -45,7 +51,10 @@ def list_patents(current_user: User = Depends(get_current_user), db: Session = D
 @patents.post("", response_model=PatentOut, status_code=status.HTTP_201_CREATED)
 def create_patent(payload: PatentCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     profile = get_or_create_profile(db, current_user)
-    record = Patent(profile_id=profile.id, **payload.model_dump(mode="json"))
+    data = payload.model_dump()
+    if data.get("patent_link") is not None:
+        data["patent_link"] = str(data["patent_link"])
+    record = Patent(profile_id=profile.id, **data)
     db.add(record); db.commit(); db.refresh(record); return record
 
 @patents.get("/{record_id}", response_model=PatentOut)
@@ -55,7 +64,10 @@ def get_patent(record_id: int, current_user: User = Depends(get_current_user), d
 @patents.put("/{record_id}", response_model=PatentOut)
 def update_patent(record_id: int, payload: PatentUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     record = get_owned_record(db, Patent, record_id, get_or_create_profile(db, current_user).id)
-    for field, value in payload.model_dump(exclude_unset=True, mode="json").items(): setattr(record, field, value)
+    data = payload.model_dump(exclude_unset=True)
+    if data.get("patent_link") is not None:
+        data["patent_link"] = str(data["patent_link"])
+    for field, value in data.items(): setattr(record, field, value)
     db.commit(); db.refresh(record); return record
 
 @patents.delete("/{record_id}", status_code=status.HTTP_204_NO_CONTENT)

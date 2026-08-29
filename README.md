@@ -1,125 +1,66 @@
-# Intelligent Research
+# Intelligent Research: AI-Powered Funding & Innovation Intelligence Platform
 
-Research Funding & Innovation Intelligence Platform
+> An AI-driven platform for research funding discovery, patent analysis, technology intelligence, and commercialization insights.
 
-## Project Description
+## 📌 Project Overview
 
-AI-powered platform for research funding, innovation, patent,
-technology intelligence, and commercialization insights.
+**Intelligent Research** is a platform designed to help researchers, startup founders, innovation managers, and administrators discover research funding opportunities, manage research information, analyze patents and publications, and support innovation and commercialization activities.
 
-## Module 1: User Authentication & Role-Based Access
+The project is being developed incrementally through multiple milestones.
 
-This repository currently contains the foundation for Module 1 only.
+## ✨ Key Features
 
-### Project structure
+- **User Authentication & Authorization**
+  - User registration and login
+  - Secure password hashing
+  - JWT-based authentication
+  - OAuth2 password flow
+  - Role-Based Access Control (RBAC)
+  - Protected APIs
+  - Current-user profile management
 
-```text
-project-root/
-├── backend/
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   ├── core/
-│   │   ├── models/
-│   │   ├── schemas/
-│   │   ├── routers/
-│   │   ├── services/
-│   │   └── dependencies/
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── context/
-│   │   └── routes/
-│   ├── package.json
-│   ├── vite.config.js
-│   └── index.html
-│
-├── .gitignore
-└── README.md
-```
+- **Research Profile Management**
+  - Research domains and interests
+  - Technology areas
+  - Publications
+  - Patents
 
-### Backend foundation
+- **Innovation Intelligence**
+  - Funding opportunity discovery
+  - Patent and technology intelligence
+  - Innovation insights
+  - Commercialization support
 
-The backend contains a minimal FastAPI application with:
-- a root endpoint
-- a health endpoint
-- a basic application entry point in `backend/app/main.py`
+## 👥 User Roles
 
-### Frontend foundation
+| Role | Description |
+| :--- | :--- |
+| **Researcher** | Manage research profile, publications, patents and discover funding opportunities |
+| **Startup Founder** | Explore innovation opportunities and funding |
+| **Innovation Manager** | Manage innovation and technology-related information |
+| **Administrator** | Manage users, authorization and platform administration |
 
-The frontend contains a minimal React landing page that runs independently.
-Authentication screens and role-based routing will be implemented in later phases.
+## 🛠️ Technology Stack
 
-### Requirements
+### Backend
 
-Python:
-- Python 3.11+
+- **Framework:** FastAPI
+- **Language:** Python 3.10+
+- **Database:** SQLite / SQLAlchemy
+- **ORM:** SQLAlchemy 2.0
+- **Data Validation:** Pydantic v2
+- **Authentication:** JWT
+- **Authorization:** Role-Based Access Control (RBAC)
+- **Password Hashing:** Passlib / bcrypt
+- **OAuth2:** OAuth2 Password Flow
+- **Testing:** Pytest / HTTPX
+- **Migration:** Alembic
 
-Node.js:
-- Node.js 18+
-- npm
+### Frontend
 
-### Backend installation
+- **Framework:** React
+- **Build Tool:** Vite
+- **Styling:** CSS
+- **Authentication State:** React Context
+- **Routing:** React Router
 
-From the project root:
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate   # macOS/Linux
-# or .venv\Scripts\activate  # Windows PowerShell
-pip install -r requirements.txt
-```
-
-### Backend start
-
-```bash
-cd backend
-source .venv/bin/activate   # macOS/Linux
-# or .venv\Scripts\activate  # Windows PowerShell
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Open the API in the browser:
-- http://localhost:8000
-- http://localhost:8000/health
-
-### Frontend installation
-
-From the project root:
-
-```bash
-cd frontend
-npm install
-```
-
-### Frontend start
-
-```bash
-cd frontend
-npm run dev
-```
-
-Open the frontend in the browser:
-- http://localhost:5173
-
-### Environment variables
-
-Use the `.env.example` files as templates. Do not commit real secrets.
-
-Backend example:
-- `backend/.env.example`
-
-Frontend example:
-- no frontend environment file is required yet in this foundation phase
-
-### Notes
-
-- No authentication, JWT, OAuth2, or RBAC logic is implemented in this phase.
-- No database models or API endpoints for users have been added yet.
-- This is intentionally a clean foundation only.

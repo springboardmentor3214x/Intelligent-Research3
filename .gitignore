@@ -1,19 +1,21 @@
-# Python
+# Python / Backend
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.pyc
+.pytest_cache/
 .venv/
 venv/
 .env
 .env.*
 !.env.example
 
-# FastAPI / SQLAlchemy / Alembic
-alembic/versions/*.pyc
+# Database
 *.db
 *.sqlite3
+
+# FastAPI / SQLAlchemy / Alembic
+alembic/versions/*.pyc
 
 # Node / React
 node_modules/
@@ -21,12 +23,10 @@ dist/
 build/
 .npm/
 .vite/
+*.log
 
-# OS / editor
+# OS / Editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-# Logs
-*.log

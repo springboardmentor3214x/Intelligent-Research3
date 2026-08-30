@@ -6,6 +6,7 @@ from app.db.init_db import init_db
 from app.routers import auth, profile, records, users
 
 settings = get_settings()
+
 app = FastAPI(
     title="Research Funding & Innovation Intelligence Platform",
     version="0.2.0",
@@ -14,7 +15,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -28,12 +32,18 @@ def startup() -> None:
 
 @app.get("/")
 def read_root():
-    return {"message": "Research Funding & Innovation Intelligence Platform API", "status": "ok"}
+    return {
+        "message": "Research Funding & Innovation Intelligence Platform API",
+        "status": "ok",
+    }
 
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "service": "backend"}
+    return {
+        "status": "healthy",
+        "service": "backend",
+    }
 
 
 app.include_router(auth.router)

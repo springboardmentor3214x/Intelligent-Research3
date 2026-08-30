@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMe } from '../services/api';
+import { apiRequest } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
 
     (async () => {
       try {
-        const data = await getMe();
+        const data = await apiRequest('/users/me');
 
         if (!cancelled) {
           setUser(data);
@@ -99,7 +99,7 @@ export function AuthProvider({ children }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const data = await getMe();
+      const data = await apiRequest('/users/me');
       setUser(data);
       localStorage.setItem('auth_user', JSON.stringify(data));
       return data;

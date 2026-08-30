@@ -55,7 +55,11 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   /* Logged in but role not permitted → go to 403 page */
-  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+  if (
+    allowedRoles &&
+    allowedRoles.length > 0 &&
+    !allowedRoles.map((r) => r.toLowerCase()).includes((role || '').toLowerCase())
+  ) {
     return <Navigate to="/unauthorized" replace />;
   }
 

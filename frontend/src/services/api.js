@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem('auth_token');
@@ -19,7 +19,10 @@ export async function apiRequest(path, options = {}) {
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Request failed: ${response.status}`);
+    const message = errorData.detail || errorData.message || `Request failed with status ${response.status}`;
+    const error = new Error(message);
+    error.response = { data: errorData, status: response.status };
+    throw error;
   }
 
   if (response.status === 204) {
@@ -27,6 +30,31 @@ export async function apiRequest(path, options = {}) {
   }
 
   return response.json();
+}
+
+export async function loginRequest(email, password) {
+  return apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function registerRequest(payload) {
+  return apiRequest('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getMe() {
+  return apiRequest('/users/me');
+}
+
+export async function updateMe(data) {
+  return apiRequest('/users/me', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
 }
 
 export default API_BASE_URL;

@@ -122,6 +122,7 @@ class ProfileOut(BaseModel):
     user_id: int
     name: str
     email: str
+    role: str | None = None
     organization: str | None = None
     department: str | None = None
     designation: str | None = None

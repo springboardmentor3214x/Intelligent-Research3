@@ -19,7 +19,7 @@ def profile_response(profile: ResearchProfile, user: User) -> dict:
     for tag in profile.tags:
         field = next((name for name, kind in TAG_FIELDS.items() if kind.value == tag.kind), None)
         if field: values[field].append(tag.value)
-    return {"id": profile.id, "user_id": user.id, "name": user.name, "email": user.email, "organization": user.organization, "department": profile.department, "designation": user.designation, "country": user.country, "research_domain": user.research_domain, **values, "publications": profile.publications, "patents": profile.patents}
+    return {"id": profile.id, "user_id": user.id, "name": user.name, "email": user.email, "role": user.role, "organization": user.organization, "department": profile.department, "designation": user.designation, "country": user.country, "research_domain": user.research_domain, **values, "publications": profile.publications, "patents": profile.patents}
 
 
 def replace_tags(db: Session, profile: ResearchProfile, field: str, values: list[str]) -> None:

@@ -21,13 +21,24 @@ class Settings(BaseSettings):
     )
 
     FRONTEND_URL: str = Field(
-        default="http://localhost:5174"
+        default="http://localhost:5173"
+    )
+
+    GOOGLE_CLIENT_ID: str = Field(
+        default=""
+    )
+    GOOGLE_CLIENT_SECRET: str = Field(
+        default=""
+    )
+    GOOGLE_REDIRECT_URI: str = Field(
+        default="http://127.0.0.1:8000/auth/google/callback"
     )
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=True
+        case_sensitive=True,
+        extra="ignore"
     )
 
     @field_validator("CORS_ORIGINS")

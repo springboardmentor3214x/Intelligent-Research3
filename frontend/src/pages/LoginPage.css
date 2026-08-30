@@ -10,7 +10,13 @@
 .login-submit { padding: 12px; border: 0; border-radius: 5px; color: #fff; background: #185abd; font-weight: 700; cursor: pointer; }
 .login-submit:hover:not(:disabled) { background: #12458f; }
 .login-submit:disabled { cursor: wait; opacity: .65; }
-.login-error { padding: 11px 12px; color: #9a3030; background: #fff4f4; border: 1px solid #e2b8b8; border-radius: 4px; font-size: .86rem; }
+.google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px 16px; background: #ffffff; color: #3c4043; border: 1px solid #dadce0; border-radius: 5px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; margin-bottom: 20px; }
+.google-btn:hover:not(:disabled) { background: #f8f9fa; border-color: #c0c4cc; box-shadow: 0 1px 3px rgba(60,64,67,0.15); }
+.google-btn:disabled { opacity: 0.6; cursor: wait; }
+.auth-divider { display: flex; align-items: center; text-align: center; margin: 18px 0; color: #829ab1; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-bottom: 1px solid #e2e8f0; }
+.auth-divider span { padding: 0 12px; }
+.login-error { padding: 11px 12px; color: #9a3030; background: #fff4f4; border: 1px solid #e2b8b8; border-radius: 4px; font-size: .86rem; margin-bottom: 16px; }
 .login-footer { margin: 24px 0 0; color: #60758d; font-size: .86rem; text-align: center; }
 .login-footer a { color: #185abd; font-weight: 700; }
 @media (max-width: 480px) { .login-panel { padding: 28px 22px; } }

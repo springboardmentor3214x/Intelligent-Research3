@@ -1,0 +1,62 @@
+/* ================================================================
+   UnauthorizedPage.css
+   ================================================================ */
+
+.unauthorized-card {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.unauthorized-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-error), hsl(340, 75%, 55%));
+}
+
+.unauthorized-icon {
+  font-size: 3.5rem;
+  margin-bottom: var(--space-md);
+  filter: grayscale(0.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+.unauthorized-code {
+  font-size: 5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--clr-error), hsl(340, 75%, 55%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+
+.unauthorized-title {
+  font-size: 1.6rem;
+  margin-bottom: var(--space-md);
+  color: var(--clr-text-primary);
+}
+
+.unauthorized-msg {
+  color: var(--clr-text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-xl);
+  font-size: 0.95rem;
+}
+
+.unauthorized-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}

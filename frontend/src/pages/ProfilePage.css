@@ -1,0 +1,108 @@
+/* ================================================================
+   ProfilePage.css
+   ================================================================ */
+
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+/* ── Sidebar ── */
+.profile-sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-md);
+  position: sticky;
+  top: 90px;
+}
+
+.profile-avatar {
+  box-shadow: 0 0 32px var(--clr-primary-glow);
+  border: 3px solid hsl(230, 85%, 60%, 0.4);
+}
+
+.profile-display-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--clr-text-primary);
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: var(--clr-text-muted);
+  word-break: break-all;
+}
+
+.profile-role-badge {
+  margin-top: -4px;
+}
+
+/* ── Main content ── */
+.profile-section-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--clr-text-muted);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--clr-border);
+}
+
+/* ── Field display ── */
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.profile-field {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--clr-border);
+}
+
+.profile-field:last-child { border-bottom: none; }
+
+.profile-field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.profile-field-value {
+  font-size: 0.95rem;
+  color: var(--clr-text-primary);
+  font-weight: 500;
+}
+
+/* ── Edit actions ── */
+.profile-edit-actions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+  .profile-sidebar {
+    position: static;
+  }
+  .profile-field {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

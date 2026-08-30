@@ -1,22 +1,4 @@
-from app.models.user import User, RoleEnum
-from app.models.research_profile import (
-    ResearchProfile,
-    ResearchArea,
-    ResearchKeyword,
-    TechnologyArea,
-    OrganizationInfo,
-    Publication,
-    Patent,
-)
+from app.models.profile import Patent, Publication, ResearchProfile, ResearchTag
+from app.models.user import RoleEnum, User
 
-__all__ = [
-    "User",
-    "RoleEnum",
-    "ResearchProfile",
-    "ResearchArea",
-    "ResearchKeyword",
-    "TechnologyArea",
-    "OrganizationInfo",
-    "Publication",
-    "Patent",
-]
+__all__ = ["User", "RoleEnum", "ResearchProfile", "ResearchTag", "Publication", "Patent"]

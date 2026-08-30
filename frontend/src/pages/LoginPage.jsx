@@ -1,124 +1,56 @@
-/**
- * pages/LoginPage.jsx
- * ──────────────────────────────────────────────────────────────
- * NOTE: This is a stub page for Pair B (Kaviya — Member 4).
- * The full implementation belongs to Pair A (Member 2 — frontend).
- * Once Pair A's work is merged, this file should be replaced.
- *
- * This stub provides:
- *   - A functional login form that calls POST /auth/login
- *   - On success, calls AuthContext.login(token, user)
- *   - Basic form validation + error display
- * ──────────────────────────────────────────────────────────────
- */
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
-import { loginRequest } from '../services/api';
-import './AuthPage.css';
+import { apiRequest } from '../services/api';
+import './LoginPage.css';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  function handleChange(event) {
+    setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
     setError('');
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!form.email || !form.password) {
-      setError('Please enter your email and password.');
-      return;
-    }
-    setLoading(true);
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setSubmitting(true);
+    setError('');
     try {
-      const data = await loginRequest(form.email, form.password);
-      /* Expected response: { access_token, token_type, user } */
-      login(data.access_token, data.user);
-      /* AuthContext.login() triggers isAuthenticated → PublicRoute redirects to /dashboard */
-    } catch (err) {
-      setError(
-        err?.response?.data?.detail ||
-        err?.message ||
-        'Invalid email or password.'
-      );
+      const session = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(form),
+      });
+      localStorage.setItem('auth_token', session.access_token);
+      const user = await apiRequest('/users/me');
+      login(session.access_token, user);
+      navigate('/profile', { replace: true });
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to sign in. Check your credentials.');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
   return (
-    <div className="page-center">
-      <div className="auth-card card animate-scale">
-        {/* Brand */}
-        <div className="auth-brand">
-          <span className="auth-brand-icon">⬡</span>
-          <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Sign in to Intelligent Research Platform</p>
-        </div>
-
-        {/* Error */}
-        {error && (
-          <div className="alert alert-error" role="alert">
-            <span>⚠</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label htmlFor="login-email" className="form-label">Email</label>
-            <input
-              id="login-email"
-              name="email"
-              type="email"
-              className="form-input"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              disabled={loading}
-              autoComplete="email"
-              autoFocus
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="login-password" className="form-label">Password</label>
-            <input
-              id="login-password"
-              name="password"
-              type="password"
-              className="form-input"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              disabled={loading}
-              autoComplete="current-password"
-            />
-          </div>
-
-          <button
-            id="btn-login-submit"
-            type="submit"
-            className="btn btn-primary btn-full"
-            disabled={loading}
-            style={{ marginTop: 'var(--space-md)' }}
-          >
-            {loading ? <><span className="spinner" /> Signing in…</> : 'Sign In'}
-          </button>
+    <main className="login-page">
+      <section className="login-panel" aria-labelledby="login-title">
+        <p className="login-eyebrow">Research intelligence platform</p>
+        <h1 id="login-title">Sign in</h1>
+        <p className="login-description">Access your research profile and professional record.</p>
+        {error ? <p className="login-error" role="alert">{error}</p> : null}
+        <form className="login-form" onSubmit={handleSubmit}>
+          <label><span>Email</span><input type="email" name="email" value={form.email} onChange={handleChange} required autoComplete="email" /></label>
+          <label><span>Password</span><input type="password" name="password" value={form.password} onChange={handleChange} required autoComplete="current-password" /></label>
+          <button className="login-submit" type="submit" disabled={submitting}>{submitting ? 'Signing in...' : 'Sign in'}</button>
         </form>
-
-        <div className="auth-footer">
-          Don't have an account?{' '}
-          <Link to="/register" id="link-go-register">Create one</Link>
-        </div>
-      </div>
-    </div>
+        <p className="login-footer">Need an account? <Link to="/register">Register</Link></p>
+      </section>
+    </main>
   );
 }

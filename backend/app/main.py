@@ -1,51 +1,43 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers.auth import router as auth_router
-from app.routers.users import router as users_router
-from app.routers.research_profile import router as research_profile_router
-from app.routers.publications import router as publications_router
-from app.routers.patents import router as patents_router
+from app.core.config import get_settings
+from app.db.init_db import init_db
+from app.routers import auth, profile, records, users
 
-
+settings = get_settings()
 app = FastAPI(
     title="Research Funding & Innovation Intelligence Platform",
-    version="0.1.0",
-    description="Research Funding & Innovation Intelligence Platform API",
+    version="0.2.0",
+    description="Authentication and research profile management API.",
 )
 
-
-# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=[origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-app.include_router(auth_router)
-app.include_router(users_router)
-app.include_router(research_profile_router)
-app.include_router(publications_router)
-app.include_router(patents_router)
+@app.on_event("startup")
+def startup() -> None:
+    init_db()
 
 
 @app.get("/")
 def read_root():
-    return {
-        "message": "Research Funding & Innovation Intelligence Platform API",
-        "status": "ok",
-    }
+    return {"message": "Research Funding & Innovation Intelligence Platform API", "status": "ok"}
 
 
 @app.get("/health")
 def health_check():
-    return {
-        "status": "healthy",
-        "service": "backend",
-    }
+    return {"status": "healthy", "service": "backend"}
+
+
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(profile.router)
+app.include_router(records.publications)
+app.include_router(records.patents)

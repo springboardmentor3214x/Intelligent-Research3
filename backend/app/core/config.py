@@ -14,18 +14,12 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = Field(default="http://localhost:5173")
     FRONTEND_URL: str = Field(default="http://localhost:5173")
 
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=True,
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=True)
 
     @field_validator("CORS_ORIGINS")
     @classmethod
     def validate_cors_origins(cls, value: str) -> str:
-        if not value:
-            return "http://localhost:5173"
-        return value
+        return value or "http://localhost:5173"
 
 
 @lru_cache()

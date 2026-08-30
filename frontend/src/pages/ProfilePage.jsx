@@ -1,224 +1,147 @@
-/**
- * pages/ProfilePage.jsx
- * Author: Kaviya (Member 4 — Pair B Frontend)
- *
- * Displays and allows editing of the current user's profile.
- *
- * Behaviour:
- *   - Loads user data from AuthContext (already fetched on mount)
- *   - Edit mode toggle — shows inline form
- *   - PUT /users/me on save → calls refreshUser() to sync context
- *   - Loading states, error and success alerts
- */
+import { useEffect, useState } from 'react';
 
-import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { updateMe } from '../services/api';
+import { apiRequest } from '../services/api';
 import './ProfilePage.css';
 
-function FieldDisplay({ label, value }) {
-  return (
-    <div className="profile-field">
-      <span className="profile-field-label">{label}</span>
-      <span className="profile-field-value">{value || '—'}</span>
-    </div>
-  );
+const profileDefaults = {
+  name: '', organization: '', department: '', designation: '', country: '', research_domain: '',
+  research_areas: [], research_interests: [], research_keywords: [], technology_areas: [],
+};
+const profileFields = [
+  ['name', 'Name', true], ['organization', 'Organization', false], ['department', 'Department', false],
+  ['designation', 'Designation', false], ['country', 'Country', false], ['research_domain', 'Research Domain', false],
+];
+const listFields = [
+  ['research_areas', 'Research Areas'], ['research_interests', 'Research Interests'],
+  ['research_keywords', 'Research Keywords'], ['technology_areas', 'Technology Areas'],
+];
+const publicationDefaults = {
+  publication_title: '', authors: '', publication_date: '', journal_or_conference: '', publication_type: '',
+  research_domain: '', keywords: '', doi: '', publication_link: '',
+};
+const patentDefaults = {
+  patent_title: '', patent_number: '', inventor: '', filing_date: '', publication_date: '',
+  patent_status: '', patent_domain: '', patent_link: '',
+};
+
+function normalizeProfile(user) {
+  return {
+    ...profileDefaults,
+    ...user,
+    research_areas: Array.isArray(user.research_areas) ? user.research_areas : [],
+    research_interests: Array.isArray(user.research_interests) ? user.research_interests : [],
+    research_keywords: Array.isArray(user.research_keywords) ? user.research_keywords : [],
+    technology_areas: Array.isArray(user.technology_areas) ? user.technology_areas : [],
+  };
+}
+
+function Tags({ values, onRemove }) {
+  if (!values.length) return <p className="empty-inline">No entries yet</p>;
+  return <div className="tag-list">{values.map((value) => <span className="tag" key={value}>{value}{onRemove ? <button type="button" aria-label={`Remove ${value}`} onClick={() => onRemove(value)}>x</button> : null}</span>)}</div>;
+}
+
+function RecordForm({ type, value, onChange, onCancel, onSave, busy }) {
+  const publication = type === 'publication';
+  const fields = publication ? [
+    ['publication_title', 'Publication title', 'text', true], ['authors', 'Authors', 'text', true], ['publication_date', 'Publication date', 'date', false],
+    ['journal_or_conference', 'Journal / Conference', 'text', false], ['publication_type', 'Publication type', 'text', false], ['research_domain', 'Research domain', 'text', false],
+    ['keywords', 'Keywords', 'text', false], ['doi', 'DOI', 'text', false], ['publication_link', 'Publication link', 'url', false],
+  ] : [
+    ['patent_title', 'Patent title', 'text', true], ['patent_number', 'Patent number', 'text', true], ['inventor', 'Inventor', 'text', true],
+    ['filing_date', 'Filing date', 'date', false], ['publication_date', 'Publication date', 'date', false], ['patent_status', 'Patent status', 'text', false],
+    ['patent_domain', 'Patent domain', 'text', false], ['patent_link', 'Patent link', 'url', false],
+  ];
+  return <form className="record-form" onSubmit={(event) => { event.preventDefault(); onSave(); }}><div className="record-form-grid">{fields.map(([name, label, inputType, required]) => <label className="form-field" key={name}><span>{label}{required ? ' *' : ''}</span><input type={inputType} value={value[name] || ''} required={required} onChange={(event) => onChange({ ...value, [name]: event.target.value })} /></label>)}</div><div className="record-actions"><button className="button button-primary" type="submit" disabled={busy}>{busy ? 'Saving...' : 'Save'}</button><button className="button button-secondary" type="button" onClick={onCancel} disabled={busy}>Cancel</button></div></form>;
+}
+
+function RecordsSection({ type, records, onRefresh, onMessage, onError }) {
+  const publication = type === 'publication';
+  const label = publication ? 'Publication' : 'Patent';
+  const [editor, setEditor] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const defaults = publication ? publicationDefaults : patentDefaults;
+  const endpoint = publication ? '/publications' : '/patents';
+
+  async function save() {
+    setBusy(true); onError('');
+    try {
+      const method = editor.value.id ? 'PUT' : 'POST';
+      const path = editor.value.id ? `${endpoint}/${editor.value.id}` : endpoint;
+      await apiRequest(path, { method, body: JSON.stringify(editor.value) });
+      setEditor(null); await onRefresh(); onMessage(`${label} saved successfully.`);
+    } catch (requestError) { onError(requestError.message || `Unable to save ${label.toLowerCase()}.`); }
+    finally { setBusy(false); }
+  }
+
+  async function remove(id) {
+    if (!window.confirm(`Delete this ${label.toLowerCase()}? This cannot be undone.`)) return;
+    setBusy(true); onError('');
+    try { await apiRequest(`${endpoint}/${id}`, { method: 'DELETE' }); await onRefresh(); onMessage(`${label} deleted successfully.`); }
+    catch (requestError) { onError(requestError.message || `Unable to delete ${label.toLowerCase()}.`); }
+    finally { setBusy(false); }
+  }
+
+  return <section className="content-card records-card"><div className="card-heading"><div><h2>{publication ? 'Publications' : 'Patents'}</h2><p>{publication ? 'Your published research record.' : 'Your intellectual property record.'}</p></div><button className="button button-primary" type="button" onClick={() => setEditor({ value: { ...defaults } })} disabled={busy}>Add {label}</button></div>{editor ? <RecordForm type={type} value={editor.value} onChange={(value) => setEditor({ value })} onCancel={() => setEditor(null)} onSave={save} busy={busy} /> : null}{records.length ? <div className="record-list">{records.map((record) => <article className="record-item" key={record.id}><div className="record-content"><h3>{publication ? record.publication_title : record.patent_title}</h3><p>{publication ? [record.authors, record.journal_or_conference, record.publication_type].filter(Boolean).join(' · ') : [record.patent_number, record.inventor, record.patent_status].filter(Boolean).join(' · ')}</p><small>{record.publication_date || record.filing_date || 'Date not provided'}</small></div><div className="record-actions"><button className="button button-secondary" type="button" onClick={() => setEditor({ value: { ...record } })} disabled={busy}>Edit</button><button className="button button-danger" type="button" onClick={() => remove(record.id)} disabled={busy}>Delete</button></div></article>)}</div> : <div className="empty-state"><strong>No {publication ? 'publications' : 'patents'} added</strong><span>Add a record to keep your profile complete.</span></div>}</section>;
 }
 
 export default function ProfilePage() {
-  const { user, role, refreshUser } = useAuth();
-
+  const { token, login } = useAuth();
+  const [profile, setProfile] = useState(profileDefaults);
+  const [savedProfile, setSavedProfile] = useState(profileDefaults);
+  const [publications, setPublications] = useState([]);
+  const [patents, setPatents] = useState([]);
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [alert, setAlert] = useState(null); // { type: 'error'|'success', msg: string }
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [tagDrafts, setTagDrafts] = useState({});
 
-  /* Form state — pre-fill from context */
-  const [formData, setFormData] = useState({
-    name: user?.name ?? '',
-  });
-  const [errors, setErrors] = useState({});
-
-  const initials = user?.name
-    ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2)
-    : user?.email?.[0]?.toUpperCase() ?? '?';
-
-  /* ── Validation ── */
-  function validate() {
-    const errs = {};
-    if (!formData.name.trim()) errs.name = 'Name is required.';
-    if (formData.name.trim().length > 100) errs.name = 'Name must be under 100 characters.';
-    return errs;
+  async function loadProfile() {
+    const user = await apiRequest('/profile');
+    const nextProfile = normalizeProfile(user);
+    setProfile(nextProfile); setSavedProfile(nextProfile);
+    setPublications(Array.isArray(user.publications) ? user.publications : []);
+    setPatents(Array.isArray(user.patents) ? user.patents : []);
   }
 
-  /* ── Handle input change ── */
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
-  }
-
-  /* ── Cancel edit ── */
-  function handleCancel() {
-    setFormData({ name: user?.name ?? '' });
-    setErrors({});
-    setAlert(null);
-    setEditing(false);
-  }
-
-  /* ── Save (PUT /users/me) ── */
-  async function handleSave(e) {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-
-    setSaving(true);
-    setAlert(null);
-    try {
-      await updateMe({ name: formData.name.trim() });
-      await refreshUser();
-      setAlert({ type: 'success', msg: 'Profile updated successfully!' });
-      setEditing(false);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.detail ||
-        err?.message ||
-        'Failed to update profile. Please try again.';
-      setAlert({ type: 'error', msg });
-    } finally {
-      setSaving(false);
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      try { await loadProfile(); }
+      catch (requestError) { if (active) setError(requestError.message || 'Unable to load your profile.'); }
+      finally { if (active) setLoading(false); }
     }
+    if (token) load();
+    return () => { active = false; };
+  }, [token]);
+
+  async function saveProfile(event) {
+    event.preventDefault(); setSaving(true); setError(''); setSuccess('');
+    try {
+      const updated = await apiRequest('/profile', { method: 'PUT', body: JSON.stringify(profile) });
+      const nextProfile = normalizeProfile(updated);
+      setProfile(nextProfile); setSavedProfile(nextProfile); login(token, updated); setEditing(false); setSuccess('Profile changes saved successfully.');
+    } catch (requestError) { setError(requestError.message || 'Unable to save your profile.'); }
+    finally { setSaving(false); }
   }
 
-  return (
-    <div className="page container animate-fade">
-      <div className="page-header">
-        <h1>My Profile</h1>
-        <p>View and manage your account information.</p>
-      </div>
+  function addTag(key) {
+    const value = (tagDrafts[key] || '').trim();
+    if (!value || profile[key].some((item) => item.toLowerCase() === value.toLowerCase())) return;
+    setProfile((current) => ({ ...current, [key]: [...current[key], value] })); setTagDrafts((current) => ({ ...current, [key]: '' }));
+  }
 
-      {/* ── Alert ── */}
-      {alert && (
-        <div className={`alert alert-${alert.type}`} role="alert" aria-live="polite">
-          <span>{alert.type === 'error' ? '⚠' : '✓'}</span>
-          <span>{alert.msg}</span>
-        </div>
-      )}
+  function cancelProfileEdit() { setProfile(savedProfile); setEditing(false); setError(''); }
+  async function refreshRecords() { await loadProfile(); }
+  function message(value) { setError(''); setSuccess(value); }
 
-      <div className="profile-layout">
-        {/* ── Left: avatar + basic info ── */}
-        <div className="profile-sidebar card card-sm">
-          <div className="avatar avatar-lg profile-avatar">{initials}</div>
-          <h2 className="profile-display-name">
-            {user?.name || user?.email?.split('@')[0] || 'User'}
-          </h2>
-          <p className="profile-email">{user?.email}</p>
-          <span
-            className={`badge ${
-              role === 'admin'
-                ? 'badge-admin'
-                : role === 'researcher'
-                ? 'badge-researcher'
-                : 'badge-user'
-            } profile-role-badge`}
-          >
-            {role ?? 'user'}
-          </span>
-
-          <div className="divider" />
-
-          {!editing && (
-            <button
-              id="btn-edit-profile"
-              className="btn btn-secondary btn-full"
-              onClick={() => { setEditing(true); setAlert(null); }}
-            >
-              ✎ Edit Profile
-            </button>
-          )}
-        </div>
-
-        {/* ── Right: detail card ── */}
-        <div className="profile-main">
-          {!editing ? (
-            /* ── View mode ── */
-            <div className="card animate-fade">
-              <div className="profile-section-heading">Account Details</div>
-              <div className="profile-fields">
-                <FieldDisplay label="Full Name" value={user?.name} />
-                <FieldDisplay label="Email" value={user?.email} />
-                <FieldDisplay label="Role" value={role} />
-                <FieldDisplay label="User ID" value={user?.id} />
-              </div>
-            </div>
-          ) : (
-            /* ── Edit mode ── */
-            <form className="card animate-scale" onSubmit={handleSave} noValidate>
-              <div className="profile-section-heading">Edit Profile</div>
-              <p style={{ fontSize: '0.85rem', color: 'var(--clr-text-muted)', marginBottom: 'var(--space-lg)' }}>
-                Update your display name below. Contact an administrator to change your email or role.
-              </p>
-
-              <div className="form-group">
-                <label htmlFor="profile-name" className="form-label">Full Name</label>
-                <input
-                  id="profile-name"
-                  name="name"
-                  type="text"
-                  className="form-input"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  disabled={saving}
-                  autoFocus
-                />
-                {errors.name && <span className="form-error">{errors.name}</span>}
-              </div>
-
-              {/* Read-only fields */}
-              <div className="form-group">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-input"
-                  value={user?.email ?? ''}
-                  disabled
-                  aria-readonly="true"
-                />
-                <span className="form-error" style={{ color: 'var(--clr-text-muted)' }}>
-                  Email cannot be changed here.
-                </span>
-              </div>
-
-              <div className="profile-edit-actions">
-                <button
-                  id="btn-save-profile"
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <span className="spinner" />
-                      Saving…
-                    </>
-                  ) : (
-                    '✓ Save Changes'
-                  )}
-                </button>
-                <button
-                  id="btn-cancel-edit"
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={handleCancel}
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  if (loading) return <main className="profile-page"><p className="page-loading" role="status">Loading research profile...</p></main>;
+  return <main className="profile-page"><div className="profile-shell"><header className="page-header"><div><p className="eyebrow">Research intelligence platform</p><h1>Research Profile</h1><p className="page-description">Manage your researcher identity, expertise, publications, and patents.</p></div><button className="button button-primary" type="button" disabled={saving} onClick={() => editing ? cancelProfileEdit() : setEditing(true)}>{editing ? 'Cancel' : 'Edit profile'}</button></header>
+    {error ? <p className="notice notice-error" role="alert">{error}</p> : null}{success ? <p className="notice notice-success" role="status">{success}</p> : null}
+    <form onSubmit={saveProfile}><section className="content-card"><div className="card-heading"><div><h2>Researcher Information</h2><p>Core identity and organization details.</p></div>{editing ? <div className="record-actions"><button className="button button-primary" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</button><button className="button button-secondary" type="button" onClick={cancelProfileEdit} disabled={saving}>Cancel</button></div> : null}</div><div className="info-grid">{profileFields.map(([key, label, required]) => editing ? <label className="form-field" key={key}><span>{label}{required ? ' *' : ''}</span><input name={key} value={profile[key]} required={required} onChange={(event) => setProfile((current) => ({ ...current, [key]: event.target.value }))} /></label> : <div className="info-item" key={key}><span>{label}</span><strong>{profile[key] || 'Not provided'}</strong></div>)}</div></section></form>
+    <section className="content-card"><div className="card-heading"><div><h2>Research Expertise</h2><p>Areas and technologies that describe your work.</p></div></div><div className="expertise-grid">{listFields.map(([key, label]) => <div className="expertise-item" key={key}><h3>{label}</h3><Tags values={profile[key]} onRemove={editing ? (value) => setProfile((current) => ({ ...current, [key]: current[key].filter((item) => item !== value) })) : null} />{editing ? <div className="tag-input"><input value={tagDrafts[key] || ''} placeholder={`Add ${label.toLowerCase()}`} onChange={(event) => setTagDrafts((current) => ({ ...current, [key]: event.target.value }))} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addTag(key); } }} /><button className="button button-secondary" type="button" onClick={() => addTag(key)}>Add</button></div> : null}</div>)}</div></section>
+    <RecordsSection type="publication" records={publications} onRefresh={refreshRecords} onMessage={message} onError={setError} /><RecordsSection type="patent" records={patents} onRefresh={refreshRecords} onMessage={message} onError={setError} />
+  </div></main>;
 }

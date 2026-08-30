@@ -1,30 +1,41 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Login() {
 
+  document.title = "Login | Research Intelligence Platform";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error,setError] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  //to handle error if user submiting without values
-   setError("");
+    //to handle error if user submiting without values
+    setError("");
 
-  if (!email) {
-    setError("Please enter your email 😡      ");
-    return;
-  }
+    if (!email) {
+      setError("Please enter your email 😡      ");
+      return;
+    }
 
-  if (!password) {
-    setError("Please enter your password 😱    ");
-    return;
-  }
+    if (!password) {
+      setError("Please enter your password 😱    ");
+      return;
+    }
 
-  console.log("Email:", email);
-  console.log("Password:", password);
-};
+    setLoading(true);
+
+    console.log("Email:", email);
+    console.log("Password:", password);
+
+    setTimeout(() => {
+      setLoading(false);
+      //setError("Invalid email or password.");
+    }, 2000);
+  };
 
   return (
     <div className="login-page">
@@ -58,47 +69,49 @@ function Login() {
           </p>
 
 
-{/* To display the error*/}
-        {error && (
-  <div className="error-message">
-    {error}
-  </div>
-)}
-        <form onSubmit={handleLogin}>
-          {/* Email */}
-          <div className="form-group">
+          {/* To display the error*/}
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+          <form onSubmit={handleLogin}>
+            {/* Email */}
+            <div className="form-group">
 
-            <label>Email</label>
+              <label>Email</label>
 
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
 
-          </div>
-
-
-          {/* Password */}
-          <div className="form-group">
-
-            <label>Password</label>
-
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-
-          </div>
+            </div>
 
 
-          <button type="submit"
-          className="login-button">
-            Sign In
-          </button>
+            {/* Password */}
+            <div className="form-group">
+
+              <label>Password</label>
+
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+
+            </div>
+
+
+            <button type="submit"
+              className="login-button"
+              disabled={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
 
           </form>
 
@@ -115,9 +128,9 @@ function Login() {
 
           <p className="register-text">
             Don't have an account?
-            <span className="register-link">
-              Register
-            </span>
+            <Link to="/register" className="register-link">
+              Sign up
+            </Link>
           </p>
 
         </div>

@@ -1,9 +1,7 @@
 /**
  * pages/RegisterPage.jsx
- * ──────────────────────────────────────────────────────────────
- * NOTE: Stub page — full implementation belongs to Pair A.
- * Provides a working register form that POSTs to /auth/register.
- * ──────────────────────────────────────────────────────────────
+ * Full User Registration implementation matching Module 1 requirements:
+ * Fields: Name, Email, Password, Role, Phone, Organization, Designation, Country, Research Domain.
  */
 
 import { useState } from 'react';
@@ -11,21 +9,39 @@ import { Link, useNavigate } from 'react-router-dom';
 import { registerRequest } from '../services/api';
 import './AuthPage.css';
 
+const ROLES = [
+  { value: 'Researcher', label: 'Researcher' },
+  { value: 'Startup Founder', label: 'Startup Founder' },
+  { value: 'Innovation Manager', label: 'Innovation Manager' },
+  { value: 'Administrator', label: 'Administrator' },
+];
+
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'Researcher',
+    phone_number: '',
+    organization: '',
+    designation: '',
+    country: '',
+    research_domain: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
     setError('');
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password) {
-      setError('All fields are required.');
+    if (!form.name.trim() || !form.email.trim() || !form.password) {
+      setError('Name, Email, and Password are required.');
       return;
     }
     if (form.password.length < 8) {
@@ -34,13 +50,17 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await registerRequest(form);
-      navigate('/login');
+      await registerRequest({
+        ...form,
+        name: form.name.trim(),
+        email: form.email.trim(),
+      });
+      navigate('/login?registered=true');
     } catch (err) {
       setError(
         err?.response?.data?.detail ||
         err?.message ||
-        'Registration failed. Please try again.'
+        'Registration failed. Please verify your details.'
       );
     } finally {
       setLoading(false);
@@ -48,16 +68,16 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="page-center">
-      <div className="auth-card card animate-scale">
+    <div className="page-center" style={{ padding: '2rem 1rem' }}>
+      <div className="auth-card card animate-scale" style={{ maxWidth: '640px' }}>
         <div className="auth-brand">
           <span className="auth-brand-icon">⬡</span>
-          <h1 className="auth-title">Create account</h1>
-          <p className="auth-subtitle">Join the Intelligent Research Platform</p>
+          <h1 className="auth-title">Create Account</h1>
+          <p className="auth-subtitle">Join the Research Funding & Innovation Platform</p>
         </div>
 
         {error && (
-          <div className="alert alert-error" role="alert">
+          <div className="alert alert-error" role="alert" style={{ marginBottom: '1.25rem' }}>
             <span>⚠</span>
             <span>{error}</span>
           </div>
@@ -94,50 +114,145 @@ export default function RegisterPage() {
         </button>
 
         <div className="auth-or-divider">
-          <span>or register with email</span>
+          <span>or register with details</span>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
-            <label htmlFor="reg-name" className="form-label">Full Name</label>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+            <div className="form-group">
+              <label htmlFor="reg-name" className="form-label">Full Name *</label>
+              <input
+                id="reg-name"
+                name="name"
+                type="text"
+                className="form-input"
+                placeholder="Dr. Alan Turing"
+                value={form.name}
+                onChange={handleChange}
+                disabled={loading}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-email" className="form-label">Email Address *</label>
+              <input
+                id="reg-email"
+                name="email"
+                type="email"
+                className="form-input"
+                placeholder="alan@institution.edu"
+                value={form.email}
+                onChange={handleChange}
+                disabled={loading}
+                required
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-password" className="form-label">Password * (Min. 8 chars)</label>
+              <input
+                id="reg-password"
+                name="password"
+                type="password"
+                className="form-input"
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                disabled={loading}
+                required
+                autoComplete="new-password"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-role" className="form-label">Platform Role *</label>
+              <select
+                id="reg-role"
+                name="role"
+                className="form-input"
+                value={form.role}
+                onChange={handleChange}
+                disabled={loading}
+                style={{ background: 'var(--clr-surface)', color: 'var(--clr-text)' }}
+              >
+                {ROLES.map((r) => (
+                  <option key={r.value} value={r.value}>
+                    {r.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-phone" className="form-label">Phone Number</label>
+              <input
+                id="reg-phone"
+                name="phone_number"
+                type="tel"
+                className="form-input"
+                placeholder="+1 (555) 019-2834"
+                value={form.phone_number}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-org" className="form-label">Organization / University</label>
+              <input
+                id="reg-org"
+                name="organization"
+                type="text"
+                className="form-input"
+                placeholder="MIT / DeepMind Research"
+                value={form.organization}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-desig" className="form-label">Designation / Title</label>
+              <input
+                id="reg-desig"
+                name="designation"
+                type="text"
+                className="form-input"
+                placeholder="Principal Investigator / Founder"
+                value={form.designation}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="reg-country" className="form-label">Country</label>
+              <input
+                id="reg-country"
+                name="country"
+                type="text"
+                className="form-input"
+                placeholder="United States / India / UK"
+                value={form.country}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </div>
+          </div>
+
+          <div className="form-group" style={{ marginTop: '1rem' }}>
+            <label htmlFor="reg-domain" className="form-label">Primary Research Domain</label>
             <input
-              id="reg-name"
-              name="name"
+              id="reg-domain"
+              name="research_domain"
               type="text"
               className="form-input"
-              placeholder="Jane Doe"
-              value={form.name}
+              placeholder="Artificial Intelligence, Quantum Computing, Biotechnology..."
+              value={form.research_domain}
               onChange={handleChange}
               disabled={loading}
-              autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="reg-email" className="form-label">Email</label>
-            <input
-              id="reg-email"
-              name="email"
-              type="email"
-              className="form-input"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              disabled={loading}
-              autoComplete="email"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="reg-password" className="form-label">Password</label>
-            <input
-              id="reg-password"
-              name="password"
-              type="password"
-              className="form-input"
-              placeholder="Min. 8 characters"
-              value={form.password}
-              onChange={handleChange}
-              disabled={loading}
-              autoComplete="new-password"
             />
           </div>
 
@@ -146,9 +261,9 @@ export default function RegisterPage() {
             type="submit"
             className="btn btn-primary btn-full"
             disabled={loading}
-            style={{ marginTop: 'var(--space-md)' }}
+            style={{ marginTop: '1.5rem', padding: '0.85rem' }}
           >
-            {loading ? <><span className="spinner" /> Creating account…</> : 'Create Account'}
+            {loading ? <><span className="spinner" /> Creating account…</> : 'Complete Registration'}
           </button>
         </form>
 
@@ -160,3 +275,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

@@ -106,6 +106,7 @@ class TokenData(BaseModel):
 # ============================================================
 
 class Token(BaseModel):
+    model_config = ConfigDict(extra="allow")
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
@@ -116,6 +117,7 @@ class Token(BaseModel):
 # ============================================================
 
 class APIResponse(BaseModel, Generic[T]):
+    model_config = ConfigDict(extra="allow")
     success: bool
     message: str
     data: Optional[T] = None

@@ -16,15 +16,15 @@ load_dotenv()
 # JWT CONFIGURATION
 # ============================================================
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY")
 
 if not SECRET_KEY:
-    raise RuntimeError("JWT_SECRET_KEY is not configured in .env")
+    raise RuntimeError("JWT_SECRET_KEY or SECRET_KEY is not configured in .env")
 
-ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+ALGORITHM = os.getenv("JWT_ALGORITHM") or os.getenv("ALGORITHM", "HS256")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "1440")
+    os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES") or os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")
 )
 
 

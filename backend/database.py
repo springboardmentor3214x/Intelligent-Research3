@@ -3,17 +3,20 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Load variables from backend/.env
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL not found in .env")
+if not DATABASE_URL or not DATABASE_URL.startswith("postgresql"):
+    raise RuntimeError("Supabase PostgreSQL DATABASE_URL is required. SQLite is disabled.")
 
-connect_args = {}
-
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+    pool_recycle=300
+)
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -30,4 +33,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        db.close()

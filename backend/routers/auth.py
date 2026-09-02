@@ -76,14 +76,18 @@ def register(
         }
     )
 
+    user_resp = UserResponse.model_validate(new_user)
     return APIResponse(
         success=True,
         message="User registered successfully.",
         data=Token(
             access_token=access_token,
             token_type="bearer",
-            user=UserResponse.model_validate(new_user)
-        )
+            user=user_resp
+        ),
+        access_token=access_token,
+        token_type="bearer",
+        user=user_resp
     )
 
 
@@ -135,14 +139,18 @@ def login(
         }
     )
 
+    user_resp = UserResponse.model_validate(user)
     return APIResponse(
         success=True,
         message="Login successful.",
         data=Token(
             access_token=access_token,
             token_type="bearer",
-            user=UserResponse.model_validate(user)
-        )
+            user=user_resp
+        ),
+        access_token=access_token,
+        token_type="bearer",
+        user=user_resp
     )
 
 
@@ -265,10 +273,16 @@ def require_admin(
 def get_current_user(
     current_user: User = Depends(get_authenticated_user)
 ):
+    user_resp = UserResponse.model_validate(current_user)
     return APIResponse(
         success=True,
         message="User profile fetched successfully.",
-        data=UserResponse.model_validate(current_user)
+        data=user_resp,
+        id=user_resp.id,
+        email=user_resp.email,
+        full_name=user_resp.full_name,
+        role=user_resp.role,
+        created_at=user_resp.created_at
     )
 
 
@@ -328,10 +342,16 @@ def update_current_user(
     db.commit()
     db.refresh(current_user)
 
+    user_resp = UserResponse.model_validate(current_user)
     return APIResponse(
         success=True,
         message="User profile updated successfully.",
-        data=UserResponse.model_validate(current_user)
+        data=user_resp,
+        id=user_resp.id,
+        email=user_resp.email,
+        full_name=user_resp.full_name,
+        role=user_resp.role,
+        created_at=user_resp.created_at
     )
 
 

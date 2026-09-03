@@ -14,11 +14,11 @@ T = TypeVar("T")
 # ============================================================
 
 class UserRegister(BaseModel):
-    full_name: str = Field(
+    name: str = Field(
         ...,
         min_length=2,
         max_length=100,
-        description="Full name of the user"
+        description="Name of the user"
     )
 
     email: EmailStr = Field(
@@ -64,7 +64,7 @@ class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    full_name: str
+    name: str
     email: EmailStr
     role: UserRole
     created_at: datetime
@@ -75,11 +75,11 @@ class UserResponse(BaseModel):
 # ============================================================
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = Field(
+    name: Optional[str] = Field(
         default=None,
         min_length=2,
         max_length=100,
-        description="Updated full name"
+        description="Updated name"
     )
 
     email: Optional[EmailStr] = Field(
@@ -107,6 +107,7 @@ class TokenData(BaseModel):
 
 class Token(BaseModel):
     model_config = ConfigDict(extra="allow")
+
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
@@ -118,6 +119,7 @@ class Token(BaseModel):
 
 class APIResponse(BaseModel, Generic[T]):
     model_config = ConfigDict(extra="allow")
+
     success: bool
     message: str
     data: Optional[T] = None

@@ -46,7 +46,7 @@ def health_check():
     }
 
 
-# Register routers for both default and /api prefixes
+# Register routers
 app.include_router(auth.router)
 app.include_router(auth.router, prefix="/api")
 
@@ -60,4 +60,4 @@ app.include_router(records.publications)
 app.include_router(records.publications, prefix="/api")
 
 app.include_router(records.patents)
-app.include_router(records.patents, prefix="/api")
+app.include_router(records.patents, prefix="/api")

@@ -120,3 +120,74 @@ class APIResponse(BaseModel, Generic[T]):
     message: str
     data: Optional[T] = None
     errors: Optional[Any] = None
+    # ============================================================
+# RESEARCH PAPER SCHEMAS
+# ============================================================
+
+class ResearchPaperBase(BaseModel):
+    title: str = Field(
+        ...,
+        min_length=1,
+        max_length=500,
+        description="Title of the research paper"
+    )
+
+    authors: str = Field(
+        ...,
+        min_length=1,
+        max_length=1000,
+        description="Authors of the research paper"
+    )
+
+    abstract: Optional[str] = Field(
+        default=None,
+        description="Abstract of the research paper"
+    )
+
+    publication_year: Optional[int] = Field(
+        default=None,
+        ge=1900,
+        description="Year in which the paper was published"
+    )
+
+    research_area: Optional[str] = Field(
+        default=None,
+        max_length=255,
+        description="Main research area"
+    )
+
+    keywords: Optional[str] = Field(
+        default=None,
+        max_length=1000,
+        description="Keywords related to the paper"
+    )
+
+    journal: Optional[str] = Field(
+        default=None,
+        max_length=500,
+        description="Journal or publication venue"
+    )
+
+    doi: Optional[str] = Field(
+        default=None,
+        max_length=255,
+        description="DOI of the research paper"
+    )
+
+    pdf_url: Optional[str] = Field(
+        default=None,
+        max_length=1000,
+        description="URL of the research paper PDF"
+    )
+
+
+class ResearchPaperCreate(ResearchPaperBase):
+    pass
+
+
+class ResearchPaperResponse(ResearchPaperBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: datetime
+    updated_at: datetime

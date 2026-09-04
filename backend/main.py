@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from database import engine, Base
-from routers import auth
+from routers import auth, research_papers
 from schemas import APIResponse
 
 # Initialize Database Tables
@@ -30,6 +30,7 @@ app.add_middleware(
 
 # Include Auth Router
 app.include_router(auth.router)
+app.include_router(research_papers.router)
 
 # Custom Exception Handler for HTTP Exceptions (400, 401, 404, 409, etc.)
 @app.exception_handler(StarletteHTTPException)

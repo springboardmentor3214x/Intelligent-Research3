@@ -3,7 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.db.init_db import init_db
+
 from app.routers import auth, profile, records, users
+from app.routers import auth, profile, records, users, research_papers
+
 
 settings = get_settings()
 
@@ -61,3 +64,7 @@ app.include_router(records.publications, prefix="/api")
 
 app.include_router(records.patents)
 app.include_router(records.patents, prefix="/api")
+app.include_router(records.patents, prefix="/api")
+
+# Module 3 - Research Papers
+app.include_router(research_papers.router)

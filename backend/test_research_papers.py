@@ -223,3 +223,11 @@ def test_research_paper_not_found():
 
     assert data["success"] is False
     assert data["message"] == "Research paper not found."
+def test_research_papers_requires_auth():
+    app.dependency_overrides.pop(get_authenticated_user, None)
+
+    response = client.get("/api/research-papers")
+
+    assert response.status_code in (401, 403)
+
+    app.dependency_overrides[get_authenticated_user] = override_get_authenticated_user

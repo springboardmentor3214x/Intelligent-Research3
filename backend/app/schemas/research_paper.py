@@ -7,6 +7,7 @@ These schemas are used:
 """
 
 from datetime import date, datetime
+from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -55,6 +56,10 @@ class ResearchPaperOut(ResearchPaperBase):
     normalized_doi: str | None = None
     created_at: datetime
     updated_at: datetime
+
+
+# Alias for compatibility with Meghana's router that uses ResearchPaperResponse
+ResearchPaperResponse = ResearchPaperOut
 
 
 class SyncSummary(BaseModel):

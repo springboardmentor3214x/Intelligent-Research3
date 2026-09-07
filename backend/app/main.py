@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.db.init_db import init_db
-from app.routers import auth, profile, records, users
+from app.routers import auth, profile, records, research, users
 
 settings = get_settings()
 app = FastAPI(
@@ -41,3 +41,4 @@ app.include_router(users.router)
 app.include_router(profile.router)
 app.include_router(records.publications)
 app.include_router(records.patents)
+app.include_router(research.router)

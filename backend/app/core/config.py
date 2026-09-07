@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
     CORS_ORIGINS: str = Field(default="http://localhost:5173")
     FRONTEND_URL: str = Field(default="http://localhost:5173")
+    AI_PROVIDER: str = Field(default="local")
+    AI_API_KEY: str | None = Field(default=None)
+    AI_MODEL: str = Field(default="metadata-heuristic-v1")
+    AI_TIMEOUT_SECONDS: float = Field(default=15.0, gt=0, le=120)
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=True)
 

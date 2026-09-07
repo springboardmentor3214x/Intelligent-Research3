@@ -10,6 +10,8 @@
 .login-submit { padding: 12px; border: 0; border-radius: 5px; color: #fff; background: #185abd; font-weight: 700; cursor: pointer; }
 .login-submit:hover:not(:disabled) { background: #12458f; }
 .login-submit:disabled { cursor: wait; opacity: .65; }
+.login-demo { width: 100%; margin-top: 10px; padding: 11px; color: #267e84; background: #eef8f5; border: 1px solid #c9e8dc; border-radius: 5px; font-weight: 700; cursor: pointer; }
+.login-demo:hover { background: #e1f3ed; }
 .login-error { padding: 11px 12px; color: #9a3030; background: #fff4f4; border: 1px solid #e2b8b8; border-radius: 4px; font-size: .86rem; }
 .login-footer { margin: 24px 0 0; color: #60758d; font-size: .86rem; text-align: center; }
 .login-footer a { color: #185abd; font-weight: 700; }

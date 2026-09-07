@@ -1,0 +1,7 @@
+export function getProfileCompletion(profile) {
+  const checks = [Boolean(profile.personalInfo.fullName && profile.personalInfo.email && profile.personalInfo.phone), Boolean(profile.organization.name && profile.organization.department), Boolean(profile.research.primaryDomain), Boolean(profile.research.interests && profile.research.summary), profile.keywords.length > 0, profile.technologies.length > 0, profile.publications.length > 0, profile.patents.length > 0];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+export function getCompletionItems(profile) {
+  return [['Basic Information', Boolean(profile.personalInfo.fullName && profile.personalInfo.email && profile.personalInfo.phone), 'basic'], ['Organization', Boolean(profile.organization.name && profile.organization.department), 'organization'], ['Research Domain', Boolean(profile.research.primaryDomain), 'research'], ['Research Interests', Boolean(profile.research.interests), 'research'], ['Keywords', profile.keywords.length > 0, 'keywords'], ['Technologies', profile.technologies.length > 0, 'technologies'], ['Publications', profile.publications.length > 0, 'publications'], ['Patents', profile.patents.length > 0, 'patents']];
+}

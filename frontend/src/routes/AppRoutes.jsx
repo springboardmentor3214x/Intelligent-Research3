@@ -3,6 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginPage from '../pages/LoginPage';
 import ProfilePage from '../pages/ProfilePage';
+import ResearchProfile from '../pages/ResearchProfile';
+import DashboardPage from '../pages/DashboardPage';
+import ResearchIntelligence from '../pages/ResearchIntelligence';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -21,7 +24,7 @@ export default function AppRoutes() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <h2>Dashboard</h2>
+            <DashboardPage />
           </ProtectedRoute>
         }
       />
@@ -33,6 +36,8 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/research-profile" element={<ProtectedRoute><ResearchProfile /></ProtectedRoute>} />
+      <Route path="/research-intelligence" element={<ProtectedRoute><ResearchIntelligence /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

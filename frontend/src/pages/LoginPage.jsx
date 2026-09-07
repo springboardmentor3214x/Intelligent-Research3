@@ -29,9 +29,27 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', session.access_token);
       const user = await apiRequest('/users/me');
       login(session.access_token, user);
-      navigate('/profile', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (requestError) {
       setError(requestError.message || 'Unable to sign in. Check your credentials.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function useDemoAccess() {
+    setSubmitting(true);
+    setError('');
+    try {
+      const session = await apiRequest('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email: 'demo.researcher@example.com', password: 'DemoPassword123' }),
+      });
+      const user = await apiRequest('/users/me', { headers: { Authorization: `Bearer ${session.access_token}` } });
+      login(session.access_token, user);
+      navigate('/dashboard', { replace: true });
+    } catch (requestError) {
+      setError(requestError.message || 'Demo workspace is unavailable. Seed the demo account first.');
     } finally {
       setSubmitting(false);
     }
@@ -49,6 +67,7 @@ export default function LoginPage() {
           <label><span>Password</span><input type="password" name="password" value={form.password} onChange={handleChange} required autoComplete="current-password" /></label>
           <button className="login-submit" type="submit" disabled={submitting}>{submitting ? 'Signing in...' : 'Sign in'}</button>
         </form>
+        <button className="login-demo" type="button" onClick={useDemoAccess}>Open demo workspace</button>
         <p className="login-footer">Need an account? <Link to="/register">Register</Link></p>
       </section>
     </main>

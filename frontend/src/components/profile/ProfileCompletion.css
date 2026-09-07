@@ -1,0 +1,203 @@
+/* Formal Profile Completion */
+.completion-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.completion-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.completion-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shield-icon {
+  color: #1e40af;
+}
+
+.completion-desc {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  max-width: 600px;
+}
+
+.completion-badge-huge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  min-width: 80px;
+}
+
+.completion-percentage {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1e40af;
+}
+
+.completion-rating {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.completion-progress-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  margin: 16px 0 18px;
+  overflow: hidden;
+}
+
+.completion-progress-bar {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.completion-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.box-title {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.checklist-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border-radius: 4px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.checklist-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.item-done {
+  color: #0f172a;
+}
+
+.item-pending {
+  color: #64748b;
+}
+
+.check-done {
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.check-pending {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+.checklist-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checklist-weight {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rec-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  color: #1e40af;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rec-action-button:hover {
+  background: #dbeafe;
+}
+
+.rec-arrow {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.completion-perfect-state {
+  padding: 16px;
+  border-radius: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  text-align: center;
+  color: #166534;
+  font-size: 0.82rem;
+}
+
+.perfect-icon {
+  color: #16a34a;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 860px) {
+  .completion-sections-grid {
+    grid-template-columns: 1fr;
+  }
+  .checklist-items {
+    grid-template-columns: 1fr;
+  }
+}

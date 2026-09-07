@@ -23,3 +23,10 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
     role: str
     user_id: int
+
+
+class GoogleAuthRequest(BaseModel):
+    credential: str | None = None
+    id_token: str | None = None
+    token: str | None = None
+    access_token: str | None = None

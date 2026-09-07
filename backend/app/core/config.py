@@ -34,6 +34,11 @@ class Settings(BaseSettings):
         default="http://127.0.0.1:8000/auth/google/callback"
     )
 
+    # Module 3 — Research Data Ingestion
+    # Optional: provide your e-mail to use OpenAlex polite pool (faster rate limits)
+    # See: https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication
+    OPENALEX_MAILTO: str = Field(default="")
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

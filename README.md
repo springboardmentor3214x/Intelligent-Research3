@@ -167,3 +167,143 @@ npm run dev                   # http://localhost:5173
 | **Member 3** (backend JWT middleware) | Token validation, `/users/me`, role field in JWT payload |
 | **Member 1** (backend auth endpoints) | `POST /auth/login` and `POST /auth/register` response shape |
 | **Member 2** (Pair A frontend) | Will replace `LoginPage.jsx` and `RegisterPage.jsx` stubs |
+
+---
+
+## 💰 Member 4 — Kaviya (Module 4: Funding Data Ingestion) — Milestone 2
+
+> **Branch:** `kaviya`
+> **Milestone:** 2 — Funding Discovery & Research Intelligence
+> **Stack:** FastAPI · SQLAlchemy 2 · Alembic · httpx · Pydantic v2 · pytest
+
+---
+
+### ✅ Completed Work — Module 4: Funding Data Ingestion
+
+#### 1. FundingOpportunity ORM Model (`backend/app/models/funding.py`)
+- Full `FundingOpportunity` SQLAlchemy model with all 18 contract fields
+- `UNIQUE(external_id, source)` deduplication constraint
+- Indexes on `status`, `deadline`, `funding_type`, `country`, `source` for fast filtering
+- Compatible with both SQLite (dev) and PostgreSQL (prod)
+- JSON columns for `research_areas[]` and `keywords[]`
+
+#### 2. Pydantic v2 Schemas (`backend/app/schemas/funding.py`)
+- `FundingOpportunityCreate` — used by normalizer on insert
+- `FundingOpportunityUpdate` — partial update for sync job
+- `FundingOpportunityRead` — stable API response shape for Member 5 & 6
+- `FundingOpportunityListResponse` — paginated envelope `{ items, page, page_size, total }`
+- `IngestionSummary` — sync job result report
+
+#### 3. Database Migration (`backend/alembic/versions/001_create_funding_opportunity.py`)
+- Creates `funding_opportunities` table with upgrade/downgrade
+- Run with: `alembic upgrade head`
+
+#### 4. NIH RePORTER Connector (`backend/app/services/funding_sources/nih_reporter_client.py`)
+- Calls `POST https://api.reporter.nih.gov/v2/projects/search`
+- No API key required — US public domain data
+- Extracts: appl_id, title, org_name, abstract_text, award_amount, project_end_date, pref_terms, study_section
+- Tenacity retry (3 attempts, exponential backoff) on network errors
+- Returns `[]` and logs error on all failures — never raises
+
+#### 5. Grants.gov Connector (`backend/app/services/funding_sources/grants_gov_client.py`)
+- Calls `POST https://apply07.grants.gov/grantsws/rest/opportunities/search`
+- No API key required — US public domain data
+- Extracts: id, title, agencyName, description, awardFloor, closeDate, cfdaList, eligibilities, oppStatus
+- Status mapping: `posted` → `active`, `archived` → `expired`, `closed` → `closed`
+
+#### 6. Normalizer (`backend/app/services/funding_sources/normalizer.py`)
+- Maps source-specific raw dicts → `FundingOpportunityCreate`
+- Parses deadline strings in 8 formats (ISO-8601, MM/DD/YYYY, dateutil fuzzy)
+- Sanitises strings to column length limits
+- Rejects records with missing required fields — returns `None`, never raises
+- Pydantic validation as final gate
+
+#### 7. Ingestion Orchestrator (`backend/app/services/funding_ingestion.py`)
+- Drives fetch → normalize → upsert pipeline per source
+- Primary dedup: `external_id + source`
+- Fallback dedup: `title + organization + deadline_date`
+- Updates 10 fields on changed existing records
+- Returns `IngestionSummary` with counts
+
+#### 8. CLI Sync Job (`backend/app/jobs/funding_sync.py`)
+- Repeatable import command: `python -m app.jobs.funding_sync`
+- Flags: `--keywords`, `--limit`, `--sources`
+- Prints formatted summary table
+- Exits code 1 on errors, 0 on success
+
+#### 9. Tests (`backend/tests/test_funding_ingestion.py`)
+- 12 unit tests covering all Definition of Done scenarios
+- In-memory SQLite — no external DB or network required
+- Mocked source clients using `pytest-mock` + `AsyncMock`
+
+#### 10. API Router Stub (`backend/app/routers/funding.py`)
+- `/api/funding/status` — returns record count
+- `GET /api/funding` — paginated list stub
+- `GET /api/funding/{id}` — detail endpoint stub
+- Stub ready for Member 5 to implement full search/auth layer
+
+---
+
+### 📁 Files Added (Milestone 2)
+
+```
+backend/
+├── requirements.txt
+├── .env.example
+├── README.md                                    ← Member 5 handoff docs
+├── alembic.ini
+├── alembic/
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│       └── 001_create_funding_opportunity.py    ← DB migration
+└── app/
+    ├── __init__.py
+    ├── main.py
+    ├── config.py
+    ├── database.py
+    ├── models/
+    │   └── funding.py                           ← FundingOpportunity ORM
+    ├── schemas/
+    │   └── funding.py                           ← Pydantic v2 schemas
+    ├── services/
+    │   ├── funding_ingestion.py                 ← Upsert orchestrator
+    │   └── funding_sources/
+    │       ├── base.py
+    │       ├── nih_reporter_client.py           ← NIH RePORTER connector
+    │       ├── grants_gov_client.py             ← Grants.gov connector
+    │       └── normalizer.py                   ← Raw → schema normalizer
+    ├── routers/
+    │   └── funding.py                           ← API stub for Member 5
+    └── jobs/
+        └── funding_sync.py                      ← CLI sync runner
+tests/
+└── test_funding_ingestion.py                    ← 12 unit tests
+```
+
+---
+
+### 🚀 How to Run (Milestone 2)
+
+```bash
+cd backend
+pip install -r requirements.txt
+cp .env.example .env             # SQLite default works out of the box
+alembic upgrade head             # Create funding_opportunities table
+python -m app.jobs.funding_sync  # Fetch from NIH + Grants.gov
+pytest tests/ -v                 # Run all tests
+uvicorn app.main:app --reload    # Start API at http://localhost:8000
+```
+
+---
+
+### 🔗 Member 4 → Member 5 Handoff
+
+| Item | Location |
+|---|---|
+| ORM model + migration | `backend/app/models/funding.py`, `alembic/versions/001_*` |
+| API response schemas | `backend/app/schemas/funding.py` |
+| Router skeleton | `backend/app/routers/funding.py` |
+| Sample sync output | Run `python -m app.jobs.funding_sync --limit 5` |
+| Field mapping docs | `backend/README.md` → Data Contract table |
+| Error/dedup notes | `backend/README.md` → Member 5 Handoff Notes |

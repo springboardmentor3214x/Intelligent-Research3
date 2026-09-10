@@ -1,0 +1,592 @@
+/* ================================================================
+   Module 5 — Patent Landscape Analysis Dashboard Styles
+   ================================================================ */
+
+.patent-module-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl, 32px);
+  padding-bottom: 60px;
+}
+
+/* ── Section Header ── */
+.patent-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-md, 16px);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.patent-section-title-group h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--clr-text-primary, #f1f5f9);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.patent-section-title-group p {
+  font-size: 0.875rem;
+  color: var(--clr-text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.patent-section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* ── Section Card Containers ── */
+.patent-card {
+  background: var(--clr-bg-surface, #0f172a);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-lg, 24px);
+  box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.3));
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Section 1: Search & Filter Controls ── */
+.patent-search-bar-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: var(--space-md, 16px);
+  flex-wrap: wrap;
+}
+
+.patent-search-input-wrap {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.patent-search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--clr-text-muted, #64748b);
+  pointer-events: none;
+}
+
+.patent-search-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 10px);
+  color: var(--clr-text-primary, #f8fafc);
+  font-size: 0.95rem;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.patent-search-input:focus {
+  outline: none;
+  border-color: var(--clr-primary, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.patent-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.patent-btn-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.patent-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.patent-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--clr-bg-elevated, #1e293b);
+  color: var(--clr-text-primary, #f1f5f9);
+  border: 1px solid var(--clr-border, #334155);
+  border-radius: var(--radius-md, 10px);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.patent-btn-secondary:hover:not(:disabled) {
+  background: var(--clr-bg-hover, #334155);
+}
+
+/* ── Filter Bar ── */
+.patent-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--clr-border, #1e293b);
+}
+
+.patent-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.patent-filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--clr-text-muted, #64748b);
+}
+
+.patent-filter-select,
+.patent-filter-input {
+  padding: 8px 12px;
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--clr-text-primary, #f8fafc);
+  font-size: 0.875rem;
+}
+
+.patent-filter-select:focus,
+.patent-filter-input:focus {
+  outline: none;
+  border-color: var(--clr-primary, #6366f1);
+}
+
+/* ── Section 2: Patent Results Table ── */
+.patent-table-wrap {
+  overflow-x: auto;
+  margin-top: 16px;
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 12px);
+}
+
+.patent-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.patent-table th {
+  background: var(--clr-bg-elevated, #161f30);
+  color: var(--clr-text-secondary, #94a3b8);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--clr-border, #1e293b);
+  white-space: nowrap;
+}
+
+.patent-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--clr-border, #1e293b);
+  vertical-align: middle;
+}
+
+.patent-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.patent-title-cell {
+  font-weight: 600;
+  color: var(--clr-text-primary, #f8fafc);
+  max-width: 340px;
+}
+
+.patent-sub-id {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: #818cf8;
+  display: block;
+  margin-top: 2px;
+}
+
+.patent-domain-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(14, 165, 233, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.patent-class-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.patent-citation-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.patent-ext-link {
+  color: var(--clr-text-muted, #64748b);
+  transition: color 150ms ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.patent-ext-link:hover {
+  color: #818cf8;
+}
+
+/* ── Pagination ── */
+.patent-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.patent-pagination-info {
+  font-size: 0.85rem;
+  color: var(--clr-text-secondary, #94a3b8);
+}
+
+.patent-pagination-btns {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Empty State ── */
+.patent-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--clr-text-secondary, #94a3b8);
+}
+
+.patent-empty-icon {
+  margin-bottom: 12px;
+  color: var(--clr-text-muted, #475569);
+}
+
+.patent-empty-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--clr-text-primary, #e2e8f0);
+  margin-bottom: 4px;
+}
+
+.patent-empty-subtext {
+  font-size: 0.85rem;
+  color: var(--clr-text-muted, #64748b);
+  max-width: 400px;
+}
+
+/* ── Section 3: Clustering Cards ── */
+.patent-clusters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.patent-cluster-card {
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 12px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patent-cluster-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.patent-cluster-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--clr-text-primary, #f8fafc);
+  margin: 0;
+}
+
+.patent-cluster-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  border-radius: var(--radius-full, 9999px);
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.patent-cluster-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.patent-keyword-tag {
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--clr-text-secondary, #cbd5e1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.patent-cluster-reps {
+  font-size: 0.8rem;
+  color: var(--clr-text-muted, #64748b);
+  border-top: 1px solid var(--clr-border, #1e293b);
+  padding-top: 8px;
+}
+
+.patent-cluster-reps ul {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.patent-cluster-reps li {
+  color: var(--clr-text-secondary, #94a3b8);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Section 4: Trend Analysis Chart ── */
+.patent-trend-chart-box {
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 12px);
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.patent-trend-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  height: 180px;
+  padding-top: 24px;
+  border-bottom: 1px solid var(--clr-border, #1e293b);
+}
+
+.patent-trend-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.patent-trend-bar-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #818cf8;
+}
+
+.patent-trend-bar-fill {
+  width: 100%;
+  max-width: 44px;
+  background: linear-gradient(180deg, #6366f1 0%, #4338ca 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 300ms ease;
+  min-height: 4px;
+}
+
+.patent-trend-bar-label {
+  font-size: 0.75rem;
+  color: var(--clr-text-muted, #64748b);
+  margin-top: 6px;
+}
+
+/* ── Section 5: Competitor Analysis ── */
+.patent-competitors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.patent-competitor-row {
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 10px);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.patent-comp-name-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.patent-comp-rank {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--clr-bg-elevated, #1e293b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a5b4fc;
+}
+
+.patent-comp-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--clr-text-primary, #f8fafc);
+}
+
+.patent-comp-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.patent-comp-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.patent-comp-stat-label {
+  font-size: 0.7rem;
+  color: var(--clr-text-muted, #64748b);
+  text-transform: uppercase;
+}
+
+.patent-comp-stat-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--clr-text-primary, #f1f5f9);
+}
+
+/* ── Section 6: Innovation Map ── */
+.patent-innovation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.patent-innovation-card {
+  background: var(--clr-bg-base, #0b0f19);
+  border: 1px solid var(--clr-border, #1e293b);
+  border-radius: var(--radius-md, 12px);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patent-inno-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--clr-border, #1e293b);
+  padding-bottom: 10px;
+}
+
+.patent-inno-domain {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.patent-inno-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--clr-text-muted, #94a3b8);
+}
+
+.patent-inno-section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--clr-text-muted, #64748b);
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.patent-inno-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.patent-inno-chip {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--clr-text-secondary, #cbd5e1);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

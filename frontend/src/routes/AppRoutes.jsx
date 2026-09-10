@@ -7,6 +7,7 @@ import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
 import ResearchProfile from '../pages/ResearchProfile';
 import FundingOpportunitiesPage from '../pages/modules/FundingOpportunitiesPage';
+import FundingDetailPage from '../pages/modules/funding/FundingDetailPage';
 import ResearchTrendsPage from '../pages/modules/ResearchTrendsPage';
 import PatentIntelligencePage from '../pages/modules/PatentIntelligencePage';
 import TechnologyIntelligencePage from '../pages/modules/TechnologyIntelligencePage';
@@ -90,6 +91,14 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/funding/:id"
+        element={
+          <ProtectedRoute>
+            <FundingDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/trends"
         element={
           <ProtectedRoute>
@@ -99,6 +108,14 @@ export default function AppRoutes() {
       />
       <Route
         path="/patent-intel"
+        element={
+          <ProtectedRoute>
+            <PatentIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patents"
         element={
           <ProtectedRoute>
             <PatentIntelligencePage />

@@ -34,10 +34,40 @@ class Settings(BaseSettings):
         default="http://127.0.0.1:8000/auth/google/callback"
     )
 
-    # Module 3 — Research Data Ingestion
+    # Module 3 — Research Data Ingestion (OpenAlex)
     # Optional: provide your e-mail to use OpenAlex polite pool (faster rate limits)
     # See: https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication
     OPENALEX_MAILTO: str = Field(default="")
+
+    # Module 3 — AI Paper Analysis (optional)
+    # If set, OpenAI or OpenAI-compatible endpoint (e.g., Modal) is used for richer structured analysis.
+    # If not set, rule-based analysis from abstract is used instead.
+    OPENAI_API_KEY: str = Field(default="")
+    OPENAI_API_BASE: str = Field(default="")
+    MODAL_TOKEN_ID: str = Field(default="")
+    MODAL_TOKEN_SECRET: str = Field(default="")
+    MODAL_AUTH_BEARER: str = Field(default="")
+
+    # Module 3 — Real-Time Research Data (Semantic Scholar)
+    # API key for authenticated access to Semantic Scholar.
+    # Unlocks higher rate limits and richer paper metadata.
+    # Get your key: https://www.semanticscholar.org/product/api
+    SEMANTIC_SCHOLAR_API_KEY: str = Field(default="")
+    GEMINI_API_KEY: str = Field(default="")
+    GOOGLE_API_KEY: str = Field(default="")
+
+    # Module 4 — Funding Data (grants.gov — no key required)
+    # Optional mailto for polite usage
+    GRANTS_GOV_MAILTO: str = Field(default="")
+
+    # Module 5 — Patent Landscape Analysis
+    # SerpApi Google Patents API Key (https://serpapi.com)
+    SERPAPI_API_KEY: str = Field(default="")
+    # USPTO Open Data Portal API Key (from developer.uspto.gov / data.uspto.gov)
+    USPTO_API_KEY: str = Field(default="")
+    # The Lens Patent API Bearer Token (from api.lens.org)
+    LENS_API_KEY: str = Field(default="")
+    PATENT_SOURCE: str = Field(default="serpapi")
 
     model_config = SettingsConfigDict(
         env_file=".env",

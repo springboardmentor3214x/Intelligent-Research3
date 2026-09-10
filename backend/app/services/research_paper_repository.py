@@ -59,16 +59,39 @@ def find_by_fingerprint(
 ) -> ResearchPaper | None:
     """
     Fallback duplicate lookup by title fingerprint + optional author + year.
-    Used when a record has no DOI and no external_id.
+    If title fingerprint is substantial (>= 12 chars), matches on title fingerprint
+    to prevent duplicate ingestions across sources.
     """
+    if not title_fp:
+        return None
+
+    # Try specific match with author and year first
     q = db.query(ResearchPaper).filter(
         ResearchPaper.title_fingerprint == title_fp
     )
+    if author_fp and publication_year:
+        match = q.filter(
+            ResearchPaper.first_author_fingerprint == author_fp,
+            ResearchPaper.publication_year == publication_year,
+        ).first()
+        if match:
+            return match
+
     if author_fp:
-        q = q.filter(ResearchPaper.first_author_fingerprint == author_fp)
+        match = q.filter(ResearchPaper.first_author_fingerprint == author_fp).first()
+        if match:
+            return match
+
     if publication_year:
-        q = q.filter(ResearchPaper.publication_year == publication_year)
-    return q.first()
+        match = q.filter(ResearchPaper.publication_year == publication_year).first()
+        if match:
+            return match
+
+    # High-confidence title-only match
+    if len(title_fp) >= 12:
+        return q.first()
+
+    return None
 
 
 # ---------------------------------------------------------------------------

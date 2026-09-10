@@ -9,8 +9,8 @@ Publication/Patent models which belong to user research profiles.
 import json
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Integer, String, Text, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 
@@ -80,6 +80,11 @@ class ResearchPaper(Base):
     open_access_url: Mapped[str | None] = mapped_column(String(2000), nullable=True)
 
     # ------------------------------------------------------------------ #
+    # AI Analysis Cache — structured JSON
+    # ------------------------------------------------------------------ #
+    ai_analysis: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # ------------------------------------------------------------------ #
     # Duplicate-detection fingerprints
     # ------------------------------------------------------------------ #
     title_fingerprint: Mapped[str | None] = mapped_column(String(500), nullable=True, index=True)
@@ -123,5 +128,52 @@ class ResearchPaper(Base):
         except (ValueError, TypeError):
             return []
 
+    def get_ai_analysis(self) -> dict | None:
+        if not self.ai_analysis:
+            return None
+        try:
+            return json.loads(self.ai_analysis)
+        except (ValueError, TypeError):
+            return None
+
     def __repr__(self) -> str:
         return f"<ResearchPaper id={self.id} title={self.title[:50]!r}>"
+
+
+class SavedResearchPaper(Base):
+    """
+    Per-user saved research paper — Module 3.
+
+    One user may save the same paper only once (unique constraint).
+    Only the owning user can read/delete their saved papers.
+    """
+
+    __tablename__ = "saved_research_papers"
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "paper_id", name="uq_saved_paper_user_paper"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    paper_id: Mapped[int] = mapped_column(
+        ForeignKey("research_papers.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, nullable=False
+    )
+
+    # Relationships for eager loading
+    paper: Mapped["ResearchPaper"] = relationship("ResearchPaper", lazy="joined")
+
+    def __repr__(self) -> str:
+        return f"<SavedResearchPaper user_id={self.user_id} paper_id={self.paper_id}>"

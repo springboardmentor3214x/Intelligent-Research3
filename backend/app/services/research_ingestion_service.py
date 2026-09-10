@@ -6,7 +6,7 @@ This is the single entry point for triggering a research sync.
 """
 
 import logging
-from typing import Any
+from typing import Any, Protocol
 
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
@@ -18,6 +18,13 @@ from app.services.research_sources.normalizer import OpenAlexNormalizer
 from app.services.research_sources.openalex_client import OpenAlexClient
 
 logger = logging.getLogger(__name__)
+
+
+class _NormalizerProtocol(Protocol):
+    """Any object with a normalize(raw) -> ResearchPaperCreate | None method."""
+
+    def normalize(self, raw: dict[str, Any]) -> ResearchPaperCreate | None:
+        ...
 
 
 class ResearchIngestionService:
@@ -32,7 +39,7 @@ class ResearchIngestionService:
     def __init__(
         self,
         client: BaseResearchSourceClient | None = None,
-        normalizer: OpenAlexNormalizer | None = None,
+        normalizer: "_NormalizerProtocol | None" = None,
     ) -> None:
         self._client = client or OpenAlexClient()
         self._normalizer = normalizer or OpenAlexNormalizer()

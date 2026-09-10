@@ -137,11 +137,12 @@ export const researchService = {
       emerging_topics: d?.emerging_topics ?? [],
       trend_topics: d?.trend_topics ?? (d?.emerging_topics ?? []).map((t) => ({
         topic: t.area || t.topic,
-        velocity: t.growth_rate ? `+${Math.round(t.growth_rate * 100)}% YoY` : '+115% YoY',
-        citation_momentum: 'High',
-        leading_institutions: 'Global Research Institutes',
-        status: t.growth_label || 'High-Growth',
-        relevance: 95,
+        area: t.area || t.topic,
+        growth_label: t.growth_label,
+        recent_count: t.recent_count,
+        older_count: t.older_count,
+        observation: t.observation,
+        status: t.growth_label || 'Active Area',
       })),
       ...d,
     };

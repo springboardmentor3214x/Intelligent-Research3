@@ -139,26 +139,29 @@ export default function ResearchTrendsPage() {
                     <div className="pub-card-main-info">
                       <div className="pub-badge-row">
                         <span className="badge-pub-type type-conference">
-                          <Flame size={12} /> {t.status || "Active Cluster"}
+                          <Flame size={12} /> {t.status || t.growth_label || "Active Research Area"}
                         </span>
-                        <span className="pub-date-text" style={{ color: "#16a34a", fontWeight: "700" }}>
-                          {t.velocity || "+110% YoY"} Growth
-                        </span>
-                        <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
-                          Momentum: <strong>{t.citation_momentum || t.citationMomentum || "High"}</strong>
-                        </span>
+                        {t.recent_count !== undefined && (
+                          <span className="pub-date-text" style={{ color: "#16a34a", fontWeight: "700" }}>
+                            {t.recent_count} Recent Papers
+                          </span>
+                        )}
+                        {t.older_count !== undefined && (
+                          <span style={{ fontSize: "0.72rem", color: "#64748b" }}>
+                            Prior baseline: <strong>{t.older_count} papers</strong>
+                          </span>
+                        )}
                       </div>
 
-                      <h4 className="pub-entry-title">{t.topic}</h4>
-                      <p className="pub-entry-authors">
-                        <strong>Leading Research Centers:</strong>{" "}
-                        {t.leading_institutions || t.leadingInstitutions || "Global Academic Institutions"}
+                      <h4 className="pub-entry-title">{t.topic || t.area}</h4>
+                      <p className="pub-entry-authors" style={{ color: "#475569", fontSize: "0.82rem", lineHeight: "1.4" }}>
+                        {t.observation || `Active research cluster derived from platform database literature analysis.`}
                       </p>
                     </div>
 
                     <div className="citation-count-badge">
-                      <span className="cite-num">{t.relevance || 92}%</span>
-                      <small className="cite-text">Relevance</small>
+                      <span className="cite-num">{t.recent_count ?? 1}</span>
+                      <small className="cite-text">Papers</small>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { useAuth } from "../context/AuthContext";
 import { useResearchProfile } from "../hooks/useResearchProfile";
+import fundingService from "../services/fundingService";
 import {
   Sparkles,
   BookOpen,
@@ -60,6 +61,19 @@ export default function DashboardPage() {
     0
   );
 
+  const [totalGrantsCount, setTotalGrantsCount] = useState(11);
+
+  React.useEffect(() => {
+    fundingService.getFunding({ page: 1, page_size: 1 })
+      .then((res) => {
+        if (res && res.total !== undefined) {
+          setTotalGrantsCount(res.total);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+
   const modules = [
     {
       title: "Module 2: Research Profile Management",
@@ -71,22 +85,22 @@ export default function DashboardPage() {
       actionText: "Manage Profile"
     },
     {
-      title: "Module 3: Funding Opportunity Discovery",
-      desc: "AI-driven grants matching engine indexing global funding calls, NSF, Horizon Europe, and industry sponsorships.",
-      badge: "Active",
-      badgeType: "active",
-      link: "/funding",
-      icon: <Search size={20} className="mod-icon-emerald" />,
-      actionText: "Explore Grants"
-    },
-    {
-      title: "Module 4: Research Trend Intelligence",
-      desc: "Emerging topic clustering, citation velocity forecasting, and cross-disciplinary novelty tracking.",
+      title: "Module 3: Research Trends Intelligence",
+      desc: "Emerging topic clustering, publication timeline velocity, and cross-disciplinary novelty tracking.",
       badge: "Active",
       badgeType: "active",
       link: "/trends",
       icon: <TrendingUp size={20} className="mod-icon-purple" />,
       actionText: "View Trends"
+    },
+    {
+      title: "Module 4: Funding Opportunities Discovery",
+      desc: "AI-driven grants matching engine indexing global funding calls across NSF, Horizon Europe, and industry sponsorships.",
+      badge: "Active",
+      badgeType: "active",
+      link: "/funding",
+      icon: <Search size={20} className="mod-icon-emerald" />,
+      actionText: "Explore Grants"
     },
     {
       title: "Module 5: Patent Landscape Analysis",
@@ -126,13 +140,13 @@ export default function DashboardPage() {
         {/* ── Top Notification / Grant Alert Banner ── */}
         <div className="dashboard-alert-banner">
           <div className="alert-banner-left">
-            <span className="alert-pill">Upcoming RFP</span>
+            <span className="alert-pill">Active RFPs</span>
             <p className="alert-text">
-              <strong>NSF Trustworthy AI 2026:</strong> Call deadline is approaching in 15 days. Profile alignment: <strong>96% match</strong>.
+              <strong>Live Funding Calls:</strong> {totalGrantsCount} federal and international grant calls indexed across NSF, Horizon Europe, DOE, and SERB.
             </p>
           </div>
           <Link to="/funding" className="btn-alert-link">
-            Review RFP Details <ArrowRight size={13} />
+            Explore All Calls <ArrowRight size={13} />
           </Link>
         </div>
 
@@ -211,19 +225,21 @@ export default function DashboardPage() {
             </div>
             <div className="metric-number-row">
               <span className="metric-number">{techCount}</span>
-              <span className="metric-growth-badge badge-cyan">TRL 7.2 Avg</span>
+              <span className="metric-growth-badge badge-cyan">
+                {techCount > 0 ? "TRL Active" : "TRL Pending"}
+              </span>
             </div>
             <span className="metric-footer-text">Frameworks & computational stacks</span>
           </div>
 
           <div className="metric-kpi-card" onClick={() => navigate("/funding")} style={{ cursor: "pointer" }}>
             <div className="metric-header">
-              <span className="metric-label">Matched Grant Calls</span>
+              <span className="metric-label">Indexed Grant Calls</span>
               <Zap size={18} className="kpi-icon-purple" />
             </div>
             <div className="metric-number-row">
-              <span className="metric-number">$4.8M+</span>
-              <span className="metric-growth-badge badge-purple">93% Fit</span>
+              <span className="metric-number">{totalGrantsCount}</span>
+              <span className="metric-growth-badge badge-purple">Live Grants</span>
             </div>
             <span className="metric-footer-text">NSF, Horizon Europe & Industry RFPs</span>
           </div>

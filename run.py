@@ -103,7 +103,7 @@ def main():
     t_frontend.start()
 
     time.sleep(2)
-    print("\n\033[1;32m" + "✔ Services are running!" + "\033[0m")
+    print("\n\033[1;32m" + "[OK] Services are running!" + "\033[0m")
     print("  - Frontend App:   \033[4;36mhttp://localhost:5173\033[0m")
     print("  - Backend API:    \033[4;36mhttp://127.0.0.1:8000\033[0m")
     print("  - API Swagger:    \033[4;36mhttp://127.0.0.1:8000/docs\033[0m")

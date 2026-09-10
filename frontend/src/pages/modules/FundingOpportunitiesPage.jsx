@@ -106,13 +106,13 @@ export default function FundingOpportunitiesPage() {
 
   return (
     <DashboardLayout
-      pageTitle="Funding Opportunity Discovery"
-      breadcrumbs={["Platform", "Module 3", "Funding Opportunity Discovery"]}
+      pageTitle="Funding Opportunities Discovery"
+      breadcrumbs={["Platform", "Module 4", "Funding Opportunities Discovery"]}
     >
       <div className="tab-pane-content">
         <div className="tab-pane-header">
           <div>
-            <h3 className="tab-section-title">Funding Opportunity Discovery</h3>
+            <h3 className="tab-section-title">Funding Opportunities Discovery</h3>
             <p className="tab-section-desc">
               Search and discover grants, research councils, innovation funds, and funding calls.
             </p>

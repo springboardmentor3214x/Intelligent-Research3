@@ -33,22 +33,22 @@ export default function Sidebar({ isOpen, onClose }) {
       badge: "Module 2"
     },
     {
-      to: "/funding",
-      label: "Funding Opportunities",
-      icon: <Search size={18} />,
-      status: "active",
-      badge: "Module 4"
-    },
-    {
       to: "/trends",
-      label: "Research Trends",
+      label: "Research Trends Intelligence",
       icon: <TrendingUp size={18} />,
       status: "active",
       badge: "Module 3"
     },
     {
+      to: "/funding",
+      label: "Funding Opportunities Discovery",
+      icon: <Search size={18} />,
+      status: "active",
+      badge: "Module 4"
+    },
+    {
       to: "/patent-intel",
-      label: "Patent Intelligence",
+      label: "Patent Landscape Analysis",
       icon: <FileKey size={18} />,
       status: "active",
       badge: "Module 5"

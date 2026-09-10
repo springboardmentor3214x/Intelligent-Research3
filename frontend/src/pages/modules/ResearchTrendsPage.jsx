@@ -51,13 +51,13 @@ export default function ResearchTrendsPage() {
 
   return (
     <DashboardLayout
-      pageTitle="Research Trend Intelligence"
-      breadcrumbs={["Platform", "Module 4", "Research Trend Intelligence"]}
+      pageTitle="Research Trends Intelligence"
+      breadcrumbs={["Platform", "Module 3", "Research Trends Intelligence"]}
     >
       <div className="tab-pane-content">
         <div className="tab-pane-header">
           <div>
-            <h3 className="tab-section-title">Research Trend Intelligence</h3>
+            <h3 className="tab-section-title">Research Trends Intelligence</h3>
             <p className="tab-section-desc">
               Publication trend analysis, emerging topic detection, research hotspots, domain monitoring, and citation analytics.
             </p>

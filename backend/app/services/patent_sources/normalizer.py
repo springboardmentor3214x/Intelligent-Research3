@@ -248,22 +248,42 @@ def normalize_serpapi_record(raw: dict[str, Any]) -> Optional[PatentRecordCreate
     domain = ipc_to_domain(ipc_primary)
     if domain == "General Technology":
         t_lower = (str(title) + " " + str(abstract or "")).lower()
-        if any(w in t_lower for w in ["neural", "machine learning", "deep learning", "artificial intelligence"]):
+        if any(w in t_lower for w in ["quantum", "qubit", "superconducting"]):
+            domain = "Quantum Computing & Advanced Hardware"
+            if not ipc_primary:
+                ipc_primary = "G06N10/00"
+        elif any(w in t_lower for w in ["neural", "machine learning", "deep learning", "artificial intelligence", "transformer", "model"]):
             domain = "Artificial Intelligence & Machine Learning"
             if not ipc_primary:
-                ipc_primary = "G06N"
-        elif any(w in t_lower for w in ["vision", "image processing", "segmentation", "detection"]):
+                ipc_primary = "G06N3/00"
+        elif any(w in t_lower for w in ["vision", "image processing", "segmentation", "detection", "camera", "optical"]):
             domain = "Computer Vision & Image Processing"
             if not ipc_primary:
-                ipc_primary = "G06T"
-        elif any(w in t_lower for w in ["medical", "imaging", "tomography", "mri", "ultrasound", "patient", "clinical"]):
+                ipc_primary = "G06T7/00"
+        elif any(w in t_lower for w in ["medical", "imaging", "tomography", "mri", "ultrasound", "patient", "clinical", "health"]):
             domain = "Medical & Healthcare Devices"
             if not ipc_primary:
-                ipc_primary = "A61B"
-        elif any(w in t_lower for w in ["battery", "electrolyte", "anode", "cathode", "lithium", "charging"]):
+                ipc_primary = "A61B5/00"
+        elif any(w in t_lower for w in ["battery", "electrolyte", "anode", "cathode", "lithium", "charging", "solar", "energy"]):
             domain = "Power Generation & Storage"
             if not ipc_primary:
                 ipc_primary = "H01M"
+        elif any(w in t_lower for w in ["network", "communication", "wireless", "5g", "transmission", "antenna", "signal"]):
+            domain = "Data Transmission & Networks"
+            if not ipc_primary:
+                ipc_primary = "H04L"
+        elif any(w in t_lower for w in ["robot", "robotics", "autonomous", "drone", "actuator", "vehicle"]):
+            domain = "Robotics & Autonomous Systems"
+            if not ipc_primary:
+                ipc_primary = "B25J"
+        elif any(w in t_lower for w in ["security", "cryptography", "encryption", "blockchain", "privacy"]):
+            domain = "Cybersecurity & Cryptography"
+            if not ipc_primary:
+                ipc_primary = "H04L9/00"
+        elif any(w in t_lower for w in ["genetic", "dna", "rna", "pharmaceutical", "drug", "biological", "protein"]):
+            domain = "Biomedical & Life Sciences"
+            if not ipc_primary:
+                ipc_primary = "A61K"
 
     # Citation count
     citation_count = 0

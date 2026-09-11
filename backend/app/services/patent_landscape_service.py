@@ -185,11 +185,21 @@ class PatentLandscapeService:
         elif selected_source == "lens":
             if self.lens_client.is_configured():
                 raw_records = self.lens_client.search(query=query, per_page=limit)
+            elif self.serpapi_client.is_configured():
+                logger.info("Lens API key not configured, automatically routing to Google Patents (SerpApi).")
+                raw_records = self.serpapi_client.search(query=query, per_page=limit)
+                selected_source = "google_patents"
+                summary.source = "google_patents"
             else:
                 logger.info("The Lens API key is not configured.")
         else:
             if self.uspto_client.is_configured():
                 raw_records = self.uspto_client.search(query=query, per_page=limit)
+            elif self.serpapi_client.is_configured():
+                logger.info("USPTO API key not configured, automatically routing to Google Patents (SerpApi).")
+                raw_records = self.serpapi_client.search(query=query, per_page=limit)
+                selected_source = "google_patents"
+                summary.source = "google_patents"
             else:
                 logger.info("USPTO API key is not configured.")
 

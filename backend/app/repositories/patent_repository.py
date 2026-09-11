@@ -167,16 +167,31 @@ def search_patents(
     """
     query = db.query(PatentRecord)
 
-    # Keyword filter on title or abstract
+    # Keyword filter on title, abstract, number, assignee, or domain
     if keyword and keyword.strip():
-        k = f"%{keyword.strip().lower()}%"
-        query = query.filter(
-            or_(
-                func.lower(PatentRecord.title).like(k),
-                func.lower(PatentRecord.abstract).like(k),
-                func.lower(PatentRecord.patent_number).like(k),
+        tokens = [t.strip().lower() for t in keyword.strip().split() if len(t.strip()) > 1]
+        if tokens:
+            for token in tokens:
+                tk = f"%{token}%"
+                query = query.filter(
+                    or_(
+                        func.lower(PatentRecord.title).like(tk),
+                        func.lower(PatentRecord.abstract).like(tk),
+                        func.lower(PatentRecord.patent_number).like(tk),
+                        func.lower(PatentRecord.assignee).like(tk),
+                        func.lower(PatentRecord.assignee_normalized).like(tk),
+                        func.lower(PatentRecord.technology_domain).like(tk),
+                    )
+                )
+        else:
+            k = f"%{keyword.strip().lower()}%"
+            query = query.filter(
+                or_(
+                    func.lower(PatentRecord.title).like(k),
+                    func.lower(PatentRecord.abstract).like(k),
+                    func.lower(PatentRecord.patent_number).like(k),
+                )
             )
-        )
 
     # Assignee filter
     if assignee and assignee.strip():

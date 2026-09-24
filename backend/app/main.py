@@ -1,38 +1,37 @@
+"""
+backend/app/main.py
+FastAPI application factory.
+- Registers all module routers
+- Configures CORS (development: allow all origins)
+- Adds a health-check endpoint
+"""
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import get_settings
-from app.db.init_db import init_db
-
-from app.routers import auth, profile, records, users
-from app.routers import auth, profile, records, users, research_papers
-
-
-settings = get_settings()
+try:
+    from app.config import get_settings
+    settings = get_settings()
+except Exception:
+    pass
 
 app = FastAPI(
-    title="Research Funding & Innovation Intelligence Platform",
+    title="Intelligent Research Platform API",
+    description="AI-powered research funding, innovation, and publication intelligence.",
     version="0.2.0",
-    description="Authentication and research profile management API.",
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:5174",
-    ],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.on_event("startup")
-def startup() -> None:
-    init_db()
-
-
+# ── Health check ──────────────────────────────────────────────────────────────
 @app.get("/")
 def read_root():
     return {
@@ -40,31 +39,39 @@ def read_root():
         "status": "ok",
     }
 
-
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health_check():
-    return {
-        "status": "healthy",
-        "service": "backend",
-    }
+    return {"status": "ok", "service": "intelligent-research-api"}
 
+# ── Routers ───────────────────────────────────────────────────────────────────
+# Module 1 / 2 / 3 routers (if available)
+try:
+    from app.routers import auth, profile, records, users
+    app.include_router(auth.router, prefix="/api")
+    app.include_router(users.router, prefix="/api")
+    app.include_router(profile.router, prefix="/api")
+    if hasattr(records, 'publications'):
+        app.include_router(records.publications, prefix="/api")
+    if hasattr(records, 'patents'):
+        app.include_router(records.patents, prefix="/api")
+except Exception:
+    pass
 
-# Register routers
-app.include_router(auth.router)
-app.include_router(auth.router, prefix="/api")
+try:
+    from app.routers import research_papers
+    app.include_router(research_papers.router, prefix="/api")
+except Exception:
+    pass
 
-app.include_router(users.router)
-app.include_router(users.router, prefix="/api")
+# Module 4 & Module 7 Member 4 routers
+try:
+    from app.routers import funding
+    app.include_router(funding.router, prefix="/api/funding", tags=["Funding"])
+except Exception:
+    pass
 
-app.include_router(profile.router)
-app.include_router(profile.router, prefix="/api")
-
-app.include_router(records.publications)
-app.include_router(records.publications, prefix="/api")
-
-app.include_router(records.patents)
-app.include_router(records.patents, prefix="/api")
-app.include_router(records.patents, prefix="/api")
-
-# Module 3 - Research Papers
-app.include_router(research_papers.router)
+try:
+    from app.routers import module7_member4
+    app.include_router(module7_member4.router, prefix="/api", tags=["Module 7 - Member 4"])
+except Exception:
+    pass

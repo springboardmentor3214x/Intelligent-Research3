@@ -37,9 +37,10 @@ app.add_middleware(
 
 # ── Routers ───────────────────────────────────────────────────────────────────
 # Module 4 funding router (Member 5 will also add endpoints here)
-from app.routers import funding  # noqa: E402
+from app.routers import funding, module7_member4  # noqa: E402
 
 app.include_router(funding.router, prefix="/api/funding", tags=["Funding"])
+app.include_router(module7_member4.router, prefix="/api", tags=["Module 7 - Member 4"])
 
 # ── Health check ──────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])

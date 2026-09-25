@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from app.routers.module7_member4 import get_member4_factors_summary
 
 from app.db.session import get_db
 from app.models.innovation_score import InnovationScore
@@ -48,9 +49,9 @@ def calculate_score(
         explanation=result["explanation"],
     )
 
+    db.rollback()
     db.add(innovation_record)
     db.commit()
-    db.refresh(innovation_record)
 
     return InnovationScoreResponse(
         technology_id=payload.technology_id,
@@ -65,6 +66,8 @@ def calculate_score(
         methodology_version="innovation_v1",
         missing_factors=missing_factors,
     )
+
+
 @router.get(
     "/innovation-score/{technology_id}",
     response_model=InnovationScoreResponse,
@@ -98,7 +101,11 @@ def get_innovation_score(
         innovation_score=record.innovation_score,
         explanation=record.explanation,
         status=record.status,
+        methodology_version=record.methodology_version,
+        missing_factors=record.missing_factors.split(", ") if record.missing_factors else [],
     )
+
+
 @router.get(
     "/innovation-score/{technology_id}/breakdown",
 )
@@ -148,6 +155,8 @@ def get_innovation_score_breakdown(
         "innovation_score": record.innovation_score,
         "status": record.status,
     }
+
+
 @router.get(
     "/innovation-score/{technology_id}/explanation",
 )
@@ -176,3 +185,60 @@ def get_innovation_score_explanation(
         "status": record.status,
         "explanation": record.explanation,
     }
+
+
+@router.get(
+    "/innovation-score/{technology_id}/calculate-from-modules",
+    response_model=InnovationScoreResponse,
+)
+def calculate_score_from_modules(
+    technology_id: str,
+    db: Session = Depends(get_db),
+):
+    member4 = get_member4_factors_summary(
+        technology_id=technology_id,
+        db=db,
+    )
+
+    result = calculate_innovation_score(
+        research_novelty=None,
+        patent_strength=None,
+        technology_maturity=member4.technology_maturity.score,
+        market_potential=member4.market_potential.score,
+        funding_relevance=member4.funding_relevance.score,
+    )
+
+    missing_factors = result.get("missing_factors", [])
+
+    innovation_record = InnovationScore(
+        technology_id=technology_id,
+        research_novelty=None,
+        patent_strength=None,
+        technology_maturity=member4.technology_maturity.score,
+        market_potential=member4.market_potential.score,
+        funding_relevance=member4.funding_relevance.score,
+        innovation_score=result["innovation_score"],
+        status=result["status"],
+        methodology_version="innovation_v1",
+        missing_factors=", ".join(missing_factors) if missing_factors else None,
+        explanation=result["explanation"],
+    )
+
+    db.rollback()
+    db.add(innovation_record)
+    db.commit()
+    db.refresh(innovation_record)
+
+    return InnovationScoreResponse(
+        technology_id=technology_id,
+        research_novelty=None,
+        patent_strength=None,
+        technology_maturity=member4.technology_maturity.score,
+        market_potential=member4.market_potential.score,
+        funding_relevance=member4.funding_relevance.score,
+        innovation_score=result["innovation_score"],
+        explanation=result["explanation"],
+        status=result["status"],
+        methodology_version="innovation_v1",
+        missing_factors=missing_factors,
+    )

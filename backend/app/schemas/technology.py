@@ -107,6 +107,7 @@ class TechnologyOut(BaseModel):
     research_direction: str | None = None
     patent_direction: str | None = None
     confidence: float | None = None
+    indicators: MaturityIndicators | dict | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -165,12 +166,16 @@ class DataSourceStatusOut(BaseModel):
 
 class SyncRequest(BaseModel):
     technology_names: list[str] = Field(
-        default=["Quantum Computing", "Large Language Models", "Edge AI"],
+        default_factory=list,
         description="Technology names to ingest from external APIs"
     )
+    technology_id: str | None = Field(
+        default=None,
+        description="Optional single technology ID (e.g. TECH_COMPUTER)"
+    )
     use_demo_fallback: bool = Field(
-        default=True,
-        description="If True, use demo data when external APIs are unavailable"
+        default=False,
+        description="If True, use demo data when external APIs are unavailable (default False)"
     )
 
 
@@ -179,4 +184,11 @@ class SyncResponse(BaseModel):
     sources_queried: list[str]
     status: str
     message: str
-    data_sources: list[DataSourceStatusOut]
+    technology: TechnologyOut | None = None
+    research_metrics: list[dict] = []
+    patent_metrics: list[dict] = []
+    maturity: MaturityOut | None = None
+    stage: str | None = None
+    data_provenance: str = "live"
+    ingestion_status: str = "success"
+    data_sources: list[DataSourceStatusOut] = []

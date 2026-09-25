@@ -48,43 +48,53 @@ async def fetch_yearly_patent_counts(
 
     # Build a per-year query by iterating years
     # PatentsView allows filtering by patent_date range
+    api_url = settings.PATENTSVIEW_API_URL or settings.PATENT_API_URL or "https://api.patentsview.org/patents/query"
+    api_key = settings.PATENTSVIEW_API_KEY
+    headers = {"Content-Type": "application/json"}
+    if api_key:
+        headers["X-Api-Key"] = api_key
+
     yearly_counts: dict[int, int] = {}
     errors = []
 
     try:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        async with httpx.AsyncClient(timeout=TIMEOUT, follow_redirects=False) as client:
             for year in range(start_year, end_year + 1):
                 query = {
-                    "q": {"_text_any": {"patent_title": technology_name}},
+                    "q": {
+                        "_and": [
+                            {"_text_any": {"patent_title": technology_name}},
+                            {"_gte": {"patent_date": f"{year}-01-01"}},
+                            {"_lte": {"patent_date": f"{year}-12-31"}},
+                        ]
+                    },
                     "f": ["patent_id"],
                     "o": {"per_page": 1},
                     "s": [{"patent_date": "asc"}],
                 }
-                # Use date filter for the year
-                query["q"] = {
-                    "_and": [
-                        {"_text_any": {"patent_title": technology_name}},
-                        {"_gte": {"patent_date": f"{year}-01-01"}},
-                        {"_lte": {"patent_date": f"{year}-12-31"}},
-                    ]
-                }
 
                 try:
                     resp = await client.post(
-                        f"{PATENTSVIEW_BASE}/patents/query",
+                        api_url,
                         json=query,
-                        headers={"Content-Type": "application/json"},
+                        headers=headers,
                     )
                     if resp.status_code == 200:
                         data = resp.json()
                         total = data.get("total_patent_count", 0)
                         yearly_counts[year] = int(total)
+                    elif resp.status_code in (301, 302, 307, 308):
+                        errors.append(f"PatentsView legacy endpoint discontinued by USPTO (HTTP {resp.status_code} -> Open Data Portal migration)")
+                        break
+                    elif resp.status_code in (401, 403):
+                        errors.append(f"PatentsView authentication required (HTTP {resp.status_code}); set PATENTSVIEW_API_KEY in .env")
+                        break
                     else:
                         errors.append(f"Year {year}: HTTP {resp.status_code}")
                 except Exception as e:
                     errors.append(f"Year {year}: {str(e)}")
 
-        status = "success" if not errors else ("partial" if yearly_counts else "error")
+        status = "success" if (not errors and yearly_counts) else ("partial" if yearly_counts else "unavailable")
         return {
             "source": "PatentsView",
             "query": technology_name,

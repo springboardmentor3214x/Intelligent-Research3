@@ -114,7 +114,7 @@ async def fetch_top_organizations(
     mailto = settings.OPENALEX_MAILTO
     params = {
         "filter": f"title_and_abstract.search:{technology_name}",
-        "group_by": "authorships.institutions.display_name",
+        "group_by": "institutions.id",
         "per_page": str(limit),
     }
     if mailto:
@@ -133,7 +133,7 @@ async def fetch_top_organizations(
         for group in data.get("group_by", [])[:limit]:
             name = group.get("key_display_name") or group.get("key", "Unknown")
             count = int(group.get("count", 0))
-            if name and name.lower() not in ("unknown institution", ""):
+            if name and name.lower() not in ("unknown institution", "", "unknown"):
                 orgs.append({"name": name, "count": count})
 
         return {

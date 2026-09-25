@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import {
@@ -13,6 +13,7 @@ import {
   fetchTechnologyCompetitors,
   triggerTechnologySync,
   recalculateTechnology,
+  searchTechnologies,
 } from '../../services/technologyService';
 
 import TechnologyCard from '../../components/technology/TechnologyCard';
@@ -39,6 +40,10 @@ import {
   Compass,
   FileText,
   Activity,
+  Zap,
+  X,
+  Database,
+  Globe,
 } from 'lucide-react';
 
 export default function TechnologyIntelligencePage() {
@@ -59,8 +64,14 @@ export default function TechnologyIntelligencePage() {
   const [opportunitiesData, setOpportunitiesData] = useState([]);
   const [competitorsData, setCompetitorsData] = useState([]);
 
-  // Filters & Search
+  // Live search state
   const [searchQuery, setSearchQuery] = useState('');
+  const [liveSearchResults, setLiveSearchResults] = useState(null); // null = not active; [] = active with no results
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchDataMode, setSearchDataMode] = useState('live');
+  const searchDebounceRef = useRef(null);
+
+  // Filters
   const [selectedDomain, setSelectedDomain] = useState('ALL');
   const [selectedStage, setSelectedStage] = useState('ALL');
 
@@ -69,9 +80,10 @@ export default function TechnologyIntelligencePage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState(null);
+  const [syncStatusType, setSyncStatusType] = useState('info'); // 'info' | 'success' | 'error'
   const [error, setError] = useState(null);
 
-  // Load initial technology catalog and opportunities
+  // ── Load initial catalog ──────────────────────────────────────────────────
   const loadData = async () => {
     setLoading(true);
     setError(null);
@@ -82,15 +94,14 @@ export default function TechnologyIntelligencePage() {
         fetchAllOpportunities(),
       ]);
 
-      const tList = Array.isArray(techList) ? techList : techList.items || [];
-      const eList = Array.isArray(emergingList) ? emergingList : emergingList.items || [];
+      const tList = Array.isArray(techList) ? techList : techList.technologies || techList.items || [];
+      const eList = Array.isArray(emergingList) ? emergingList : emergingList.technologies || emergingList.items || [];
       const oList = Array.isArray(oppsList) ? oppsList : oppsList.items || [];
 
       setTechnologies(tList);
       setEmergingTechs(eList);
       setAllOpportunities(oList);
 
-      // If no tech selected yet, select the first one if available
       if (!selectedTechId && tList.length > 0) {
         setSelectedTechId(tList[0].technology_id);
       }
@@ -106,7 +117,88 @@ export default function TechnologyIntelligencePage() {
     loadData();
   }, []);
 
-  // Load deep dive data when selectedTechId changes
+  // ── Live Search with Debounce ─────────────────────────────────────────────
+  const executeLiveSearch = useCallback(async (query, domain, stage) => {
+    if (!query || query.trim().length < 2) {
+      setLiveSearchResults(null);
+      setIsSearching(false);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const result = await searchTechnologies(query.trim(), {
+        domain: domain !== 'ALL' ? domain : undefined,
+        stage: stage !== 'ALL' ? stage : undefined,
+      });
+      const items = Array.isArray(result) ? result : result.technologies || result.items || [];
+      setLiveSearchResults(items);
+      setSearchDataMode(result.data_mode || 'live');
+    } catch (err) {
+      console.error('Live search error:', err);
+      setLiveSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  const handleSearchChange = (e) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+
+    if (!val.trim()) {
+      setLiveSearchResults(null);
+      setIsSearching(false);
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      return;
+    }
+
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => {
+      executeLiveSearch(val, selectedDomain, selectedStage);
+    }, 600);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim().length >= 2) {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+      executeLiveSearch(searchQuery, selectedDomain, selectedStage);
+    }
+    if (e.key === 'Escape') {
+      clearSearch();
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
+    setLiveSearchResults(null);
+    setIsSearching(false);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+  };
+
+  // ── Search & Ingest (when no results found) ───────────────────────────────
+  const handleSearchAndIngest = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSyncing(true);
+    setSyncStatusMsg(`Ingesting real-time intelligence for "${searchQuery}" from OpenAlex & Google Gemini AI...`);
+    setSyncStatusType('info');
+    try {
+      await triggerTechnologySync([searchQuery.trim()]);
+      setSyncStatusMsg(`✓ Data ingested for "${searchQuery}" — refreshing catalog...`);
+      setSyncStatusType('success');
+      await loadData();
+      // Re-run search to show newly ingested results
+      await executeLiveSearch(searchQuery, selectedDomain, selectedStage);
+      setTimeout(() => setSyncStatusMsg(null), 5000);
+    } catch (err) {
+      setSyncStatusMsg(`Note: ${err.message}`);
+      setSyncStatusType('error');
+      setTimeout(() => setSyncStatusMsg(null), 6000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // ── Deep-dive loading ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!selectedTechId) return;
 
@@ -153,85 +245,108 @@ export default function TechnologyIntelligencePage() {
     };
   }, [selectedTechId]);
 
-  // Handle tech selection & switch to detail view
+  // ── Select tech + switch to detail ───────────────────────────────────────
   const handleSelectTechnology = (techId, switchToDetail = true) => {
     setSelectedTechId(techId);
-    if (switchToDetail) {
-      setActiveTab('detail');
-    }
+    if (switchToDetail) setActiveTab('detail');
   };
 
-  // Trigger sync / refresh
+  // ── Sync selected technology ──────────────────────────────────────────────
   const handleSyncData = async () => {
     if (!selectedTechId) return;
     setIsSyncing(true);
-    setSyncStatusMsg('Ingesting real-time OpenAlex & patent data...');
+    setSyncStatusMsg('Ingesting real-time OpenAlex & Google Gemini AI data...');
+    setSyncStatusType('info');
     try {
       await triggerTechnologySync(selectedTechId);
       await recalculateTechnology(selectedTechId);
-      setSyncStatusMsg('Sync & recalculation complete!');
+      setSyncStatusMsg('✓ Sync & recalculation complete!');
+      setSyncStatusType('success');
       await loadData();
       setTimeout(() => setSyncStatusMsg(null), 4000);
     } catch (err) {
       setSyncStatusMsg(`Sync note: ${err.message}`);
+      setSyncStatusType('error');
       setTimeout(() => setSyncStatusMsg(null), 5000);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Filtered technologies
-  const filteredTechnologies = useMemo(() => {
-    return technologies.filter((t) => {
-      const matchesSearch =
-        !searchQuery ||
-        t.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.domain?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (t.keywords && t.keywords.some((k) => k.toLowerCase().includes(searchQuery.toLowerCase())));
+  // ── Filter on catalog (when no live search active) ────────────────────────
+  const filteredCatalog = useMemo(() => {
+    // If live search is active, use its results
+    if (liveSearchResults !== null) return liveSearchResults;
 
+    return technologies.filter((t) => {
       const matchesDomain = selectedDomain === 'ALL' || t.domain === selectedDomain;
       const matchesStage = selectedStage === 'ALL' || t.stage?.toLowerCase() === selectedStage.toLowerCase();
-
-      return matchesSearch && matchesDomain && matchesStage;
+      return matchesDomain && matchesStage;
     });
-  }, [technologies, searchQuery, selectedDomain, selectedStage]);
+  }, [technologies, liveSearchResults, selectedDomain, selectedStage]);
 
-  // Distinct domains
+  // Distinct domains from catalog
   const availableDomains = useMemo(() => {
     const set = new Set(technologies.map((t) => t.domain).filter(Boolean));
     return Array.from(set);
   }, [technologies]);
 
-  // Summary Metrics
+  // Summary stats
   const summaryStats = useMemo(() => {
-    const total = technologies.length;
-    const emergingCount = technologies.filter((t) => (t.stage || '').toLowerCase() === 'emerging').length;
-    const avgScore = total > 0
-      ? Math.round(technologies.reduce((acc, t) => acc + (t.score || 0), 0) / total)
-      : 0;
+    const base = technologies;
+    const total = base.length;
+    const emergingCount = base.filter((t) => (t.stage || '').toLowerCase() === 'emerging').length;
+    const avgScore =
+      total > 0 ? Math.round(base.reduce((acc, t) => acc + (t.score || 0), 0) / total) : 0;
     const totalOpportunities = allOpportunities.length;
     return { total, emergingCount, avgScore, totalOpportunities };
   }, [technologies, allOpportunities]);
 
+  const syncMsgColor = syncStatusType === 'success' ? '#34d399' : syncStatusType === 'error' ? '#f87171' : '#38bdf8';
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <DashboardLayout
       pageTitle="Technology Intelligence"
       breadcrumbs={['Research Intelligence', 'Module 6', 'Technology Intelligence']}
     >
       <div className="tech-intel-container">
+
         {/* ── Top Bar & Actions ── */}
         <div className="tech-topbar">
           <div className="tech-filters">
+            {/* Live Search Input */}
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={16} style={{ position: 'absolute', left: 10, color: 'var(--clr-text-muted)' }} />
+              {isSearching ? (
+                <RefreshCw
+                  size={15}
+                  style={{ position: 'absolute', left: 10, color: '#38bdf8', animation: 'spin 1s linear infinite' }}
+                />
+              ) : (
+                <Search size={15} style={{ position: 'absolute', left: 10, color: 'var(--clr-text-muted)' }} />
+              )}
               <input
                 type="text"
-                placeholder="Search technologies, domains, keywords..."
+                placeholder="Search & ingest technologies (press Enter)..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
                 className="tech-search-input"
-                style={{ paddingLeft: '34px', minWidth: '260px' }}
+                style={{ paddingLeft: '34px', paddingRight: searchQuery ? '34px' : '12px', minWidth: '300px' }}
               />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  style={{
+                    position: 'absolute', right: 8,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'var(--clr-text-muted)', padding: 0, display: 'flex',
+                  }}
+                  title="Clear search"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
 
             <select
@@ -241,9 +356,7 @@ export default function TechnologyIntelligencePage() {
             >
               <option value="ALL">All Domains</option>
               {availableDomains.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
+                <option key={d} value={d}>{d}</option>
               ))}
             </select>
 
@@ -262,7 +375,8 @@ export default function TechnologyIntelligencePage() {
 
           <div className="tech-actions">
             {syncStatusMsg && (
-              <span style={{ fontSize: '0.8rem', color: '#38bdf8', marginRight: 8 }}>
+              <span style={{ fontSize: '0.8rem', color: syncMsgColor, marginRight: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+                {syncStatusType === 'info' && <RefreshCw size={12} className="spinning" />}
                 {syncStatusMsg}
               </span>
             )}
@@ -270,7 +384,7 @@ export default function TechnologyIntelligencePage() {
               className="tech-btn tech-btn-secondary"
               onClick={loadData}
               disabled={loading}
-              title="Refresh Data"
+              title="Refresh Catalog"
             >
               <RefreshCw size={14} className={loading ? 'spinning' : ''} />
               Refresh
@@ -280,25 +394,53 @@ export default function TechnologyIntelligencePage() {
                 className="tech-btn tech-btn-primary"
                 onClick={handleSyncData}
                 disabled={isSyncing}
-                title="Synchronize live research and patent data via OpenAlex & PatentsView"
+                title="Trigger real-time OpenAlex & PatentsView ingestion for the selected technology"
               >
                 <Activity size={14} />
-                {isSyncing ? 'Ingesting...' : 'Sync Live Ingestion'}
+                {isSyncing ? 'Ingesting...' : 'Sync Live Data'}
               </button>
             )}
           </div>
         </div>
 
-        {/* ── Demo Data Transparency Notice ── */}
+        {/* ── Live Search Active Banner ── */}
+        {liveSearchResults !== null && searchQuery && (
+          <div style={{
+            background: 'rgba(56, 189, 248, 0.08)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            borderRadius: 'var(--radius-md)',
+            padding: '10px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '0.85rem',
+            marginBottom: 4,
+          }}>
+            <span style={{ color: '#38bdf8', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Globe size={14} />
+              Live search: <strong>"{searchQuery}"</strong> — {liveSearchResults.length} result{liveSearchResults.length !== 1 ? 's' : ''} from database
+              {searchDataMode && searchDataMode !== 'demo' && (
+                <span style={{ background: 'rgba(52, 211, 153, 0.15)', color: '#34d399', borderRadius: 4, padding: '1px 7px', marginLeft: 4, fontSize: '0.75rem' }}>
+                  LIVE DATA
+                </span>
+              )}
+            </span>
+            <button onClick={clearSearch} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--clr-text-muted)', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem' }}>
+              <X size={13} /> Clear
+            </button>
+          </div>
+        )}
+
+        {/* ── Data Provenance Notice ── */}
         <div className="tech-banner-demo">
           <div className="icon-col">
-            <AlertTriangle size={20} />
+            <Database size={18} />
           </div>
           <div>
-            <strong>Transparent Data Provenance:</strong> This system uses real scholarly and patent telemetry via{' '}
-            <span style={{ color: '#fff', fontWeight: 600 }}>OpenAlex</span> and{' '}
-            <span style={{ color: '#fff', fontWeight: 600 }}>PatentsView</span> APIs. For seeded bootstrap entries lacking live network feeds, synthetic metrics are clearly labeled with the{' '}
-            <span className="badge-source demo" style={{ margin: '0 4px' }}>DEMO DATA</span> badge and excluded from live clinical/commercial reliance.
+            <strong>Real-Time Data Provenance:</strong> Sourced live from{' '}
+            <span style={{ color: '#fff', fontWeight: 600 }}>OpenAlex</span> (empirical research works) and{' '}
+            <span style={{ color: '#00e5ff', fontWeight: 600 }}>Google Gemini AI</span> (real-time forecasting, maturity indicators & innovation signals).
+            Search any technology to trigger instant live ingestion with zero mock data.
           </div>
         </div>
 
@@ -349,7 +491,7 @@ export default function TechnologyIntelligencePage() {
           >
             <Layers size={16} />
             Technology Catalog
-            <span className="tab-badge">{filteredTechnologies.length}</span>
+            <span className="tab-badge">{filteredCatalog.length}</span>
           </button>
 
           <button
@@ -384,13 +526,67 @@ export default function TechnologyIntelligencePage() {
         {/* ── TAB 1: Technology Catalog ── */}
         {activeTab === 'catalog' && (
           <div>
-            {filteredTechnologies.length === 0 ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--clr-text-muted)' }}>
-                No technologies match your filter criteria. Try resetting the domain or search term.
+            {loading ? (
+              <div style={{ padding: '60px', textAlign: 'center', color: 'var(--clr-text-muted)' }}>
+                <RefreshCw size={24} style={{ animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+                <div>Loading technology catalog from database...</div>
+              </div>
+            ) : error ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: '#f87171' }}>
+                <AlertTriangle size={24} style={{ marginBottom: 8 }} />
+                <div>{error}</div>
+                <button className="tech-btn tech-btn-secondary" onClick={loadData} style={{ marginTop: 12 }}>
+                  <RefreshCw size={14} /> Retry
+                </button>
+              </div>
+            ) : filteredCatalog.length === 0 ? (
+              <div style={{
+                padding: '60px 40px',
+                textAlign: 'center',
+                background: 'var(--clr-bg-surface)',
+                border: '1px dashed var(--clr-border)',
+                borderRadius: 'var(--radius-md)',
+              }}>
+                {isSearching ? (
+                  <>
+                    <RefreshCw size={28} style={{ animation: 'spin 1s linear infinite', color: '#38bdf8', marginBottom: 12 }} />
+                    <div style={{ color: 'var(--clr-text-secondary)', marginBottom: 4 }}>
+                      Searching OpenAlex database for "{searchQuery}"...
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Database size={36} style={{ color: 'var(--clr-text-muted)', marginBottom: 12, opacity: 0.5 }} />
+                    <div style={{ color: 'var(--clr-text-primary)', fontWeight: 600, fontSize: '1.05rem', marginBottom: 6 }}>
+                      {searchQuery ? `No results for "${searchQuery}"` : 'No technologies match your filters'}
+                    </div>
+                    <div style={{ color: 'var(--clr-text-secondary)', fontSize: '0.88rem', marginBottom: 20 }}>
+                      {searchQuery
+                        ? 'This technology is not yet in the database. Trigger live ingestion to fetch real-time data from OpenAlex & PatentsView.'
+                        : 'Try resetting your domain or stage filter.'}
+                    </div>
+                    {searchQuery && (
+                      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button
+                          className="tech-btn tech-btn-primary"
+                          onClick={handleSearchAndIngest}
+                          disabled={isSyncing}
+                          style={{ padding: '10px 20px', fontSize: '0.9rem' }}
+                        >
+                          <Zap size={15} />
+                          {isSyncing ? 'Ingesting from OpenAlex...' : `Ingest "${searchQuery}" from Live APIs`}
+                        </button>
+                        <button className="tech-btn tech-btn-secondary" onClick={clearSearch}>
+                          <X size={14} /> Clear Search
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             ) : (
               <div className="tech-grid">
-                {filteredTechnologies.map((tech) => (
+                {filteredCatalog.map((tech) => (
                   <TechnologyCard
                     key={tech.technology_id}
                     tech={tech}
@@ -423,16 +619,24 @@ export default function TechnologyIntelligencePage() {
               </p>
             </div>
 
-            <div className="tech-grid">
-              {emergingTechs.map((tech) => (
-                <TechnologyCard
-                  key={tech.technology_id}
-                  tech={tech}
-                  isSelected={selectedTechId === tech.technology_id}
-                  onSelect={(id) => handleSelectTechnology(id, true)}
-                />
-              ))}
-            </div>
+            {emergingTechs.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--clr-text-muted)' }}>
+                <Compass size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
+                <div>No emerging technologies detected yet.</div>
+                <div style={{ fontSize: '0.85rem', marginTop: 6 }}>Search and ingest technologies in the Catalog tab to populate this radar.</div>
+              </div>
+            ) : (
+              <div className="tech-grid">
+                {emergingTechs.map((tech) => (
+                  <TechnologyCard
+                    key={tech.technology_id}
+                    tech={tech}
+                    isSelected={selectedTechId === tech.technology_id}
+                    onSelect={(id) => handleSelectTechnology(id, true)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -455,15 +659,23 @@ export default function TechnologyIntelligencePage() {
               </p>
             </div>
 
-            <div className="opportunities-grid">
-              {allOpportunities.map((opp, idx) => (
-                <OpportunityCard
-                  key={opp.id || idx}
-                  opportunity={opp}
-                  onSelectTech={(id) => handleSelectTechnology(id, true)}
-                />
-              ))}
-            </div>
+            {allOpportunities.length === 0 ? (
+              <div style={{ padding: '40px', textAlign: 'center', color: 'var(--clr-text-muted)' }}>
+                <Lightbulb size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
+                <div>No opportunity signals detected yet.</div>
+                <div style={{ fontSize: '0.85rem', marginTop: 6 }}>Opportunities are auto-detected after live data is ingested via the Sync button or Search & Ingest.</div>
+              </div>
+            ) : (
+              <div className="opportunities-grid">
+                {allOpportunities.map((opp, idx) => (
+                  <OpportunityCard
+                    key={opp.id || idx}
+                    opportunity={opp}
+                    onSelectTech={(id) => handleSelectTechnology(id, true)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -472,7 +684,8 @@ export default function TechnologyIntelligencePage() {
           <div className="tech-detail-view">
             {detailLoading && !techDetail ? (
               <div style={{ padding: '60px', textAlign: 'center', color: 'var(--clr-text-muted)' }}>
-                Loading deep-dive technology intelligence...
+                <RefreshCw size={24} style={{ animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+                <div>Loading deep-dive technology intelligence...</div>
               </div>
             ) : techDetail ? (
               <>
@@ -498,6 +711,7 @@ export default function TechnologyIntelligencePage() {
                         className="tech-btn tech-btn-secondary"
                         onClick={handleSyncData}
                         disabled={isSyncing}
+                        title="Fetch latest data from OpenAlex & PatentsView"
                       >
                         <RefreshCw size={13} className={isSyncing ? 'spinning' : ''} />
                         {isSyncing ? 'Syncing...' : 'Sync Data'}
@@ -505,16 +719,16 @@ export default function TechnologyIntelligencePage() {
                     </div>
                   </div>
 
-                  <p style={{ color: 'var(--clr-text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
-                    {techDetail.description}
-                  </p>
+                  {techDetail.description && (
+                    <p style={{ color: 'var(--clr-text-secondary)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                      {techDetail.description}
+                    </p>
+                  )}
 
                   {techDetail.keywords && techDetail.keywords.length > 0 && (
                     <div className="detail-keywords">
                       {techDetail.keywords.map((kw, i) => (
-                        <span key={i} className="keyword-pill">
-                          #{kw}
-                        </span>
+                        <span key={i} className="keyword-pill">#{kw}</span>
                       ))}
                     </div>
                   )}
@@ -546,7 +760,7 @@ export default function TechnologyIntelligencePage() {
                         6-Indicator Weighted Assessment
                       </h4>
                       <IndicatorBreakdown
-                        indicators={maturityData?.indicators || {}}
+                        indicators={maturityData?.indicators || techDetail?.indicators || {}}
                         weights={maturityData?.weights || undefined}
                       />
                     </div>
@@ -581,7 +795,13 @@ export default function TechnologyIntelligencePage() {
                       Comparison of academic dissemination (OpenAlex) and commercial patent grants (PatentsView) across active recorded years.
                     </p>
 
-                    <MiniLineChart data={historyData} height={230} />
+                    {historyData.length > 0 ? (
+                      <MiniLineChart data={historyData} height={230} />
+                    ) : (
+                      <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--clr-text-muted)', fontSize: '0.85rem' }}>
+                        No historical metrics yet. Click <strong>Sync Data</strong> to fetch live data from OpenAlex & PatentsView.
+                      </div>
+                    )}
 
                     {/* Evidence & Explanation Block */}
                     {maturityData?.explanation && (
@@ -613,11 +833,17 @@ export default function TechnologyIntelligencePage() {
                       Top Institutional & Commercial Competitors
                     </h3>
                     <span style={{ fontSize: '0.78rem', color: 'var(--clr-text-muted)' }}>
-                      Research & Patent Volume Leaders
+                      Research & Patent Volume Leaders (OpenAlex)
                     </span>
                   </div>
 
-                  <CompetitorTable competitors={competitorsData} />
+                  {competitorsData.length > 0 ? (
+                    <CompetitorTable competitors={competitorsData} />
+                  ) : (
+                    <div style={{ padding: '30px', textAlign: 'center', color: 'var(--clr-text-muted)', fontSize: '0.85rem' }}>
+                      No organization data yet. Click <strong>Sync Data</strong> to fetch institution leaderboards from OpenAlex.
+                    </div>
+                  )}
                 </div>
 
                 {/* Technology-Specific Opportunity Signals */}

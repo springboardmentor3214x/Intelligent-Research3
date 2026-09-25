@@ -56,10 +56,40 @@ export async function fetchTechnologySources(techId) {
   return apiRequest(`/api/technologies/${techId}/sources`);
 }
 
-export async function triggerTechnologySync(techId) {
+export async function searchTechnologies(query, params = {}) {
+  const qParams = new URLSearchParams();
+  qParams.set('q', query);
+  if (params.domain && params.domain !== 'ALL') qParams.set('domain', params.domain);
+  if (params.stage && params.stage !== 'ALL') qParams.set('stage', params.stage);
+  return apiRequest(`/api/technologies/search?${qParams.toString()}`);
+}
+
+export async function triggerTechnologySync(techTarget) {
+  let body = {};
+  if (Array.isArray(techTarget)) {
+    body = { technology_names: techTarget };
+  } else if (typeof techTarget === 'string') {
+    if (techTarget.startsWith('TECH_')) {
+      // It's a technology ID — only pass the ID; backend will resolve the name
+      body = { technology_id: techTarget };
+    } else {
+      body = { technology_names: [techTarget] };
+    }
+  } else if (techTarget && typeof techTarget === 'object') {
+    // Object with name and/or technology_id
+    const name = techTarget.name;
+    const tid = techTarget.technology_id;
+    body = {
+      technology_names: name && !name.startsWith('TECH_') ? [name] : undefined,
+      technology_id: tid || undefined,
+    };
+    // Clean up undefined keys
+    if (!body.technology_names) delete body.technology_names;
+    if (!body.technology_id) delete body.technology_id;
+  }
   return apiRequest('/api/technologies/sync', {
     method: 'POST',
-    body: JSON.stringify({ technology_id: techId }),
+    body: JSON.stringify(body),
   });
 }
 
@@ -68,3 +98,4 @@ export async function recalculateTechnology(techId) {
     method: 'POST',
   });
 }
+

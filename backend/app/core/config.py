@@ -38,15 +38,18 @@ class Settings(BaseSettings):
     # ── Module 3 & 6 — Research Data & OpenAlex (polite pool) ───────────────────
     OPENALEX_MAILTO: str = Field(default="")
 
-    # ── Module 6: Technology Intelligence API Configuration ──────────────────
-    # Semantic Scholar (optional, improves rate limits)
+    # Module 6 & Gemini AI Intelligence
+    GEMINI_API_KEY: str = Field(default="")
+    GOOGLE_API_KEY: str = Field(default="")
     SEMANTIC_SCHOLAR_API_KEY: str = Field(default="")
     # Patent APIs
     EPO_CLIENT_ID: str = Field(default="")
     EPO_CLIENT_SECRET: str = Field(default="")
     PATENT_API_URL: str = Field(default="https://api.patentsview.org/patents/query")
+    PATENTSVIEW_API_KEY: str = Field(default="")
+    PATENTSVIEW_API_URL: str = Field(default="https://api.patentsview.org/patents/query")
     # Module 6 feature flags
-    TECH_AUTO_SEED_DEMO: bool = Field(default=True, description="Auto-seed demo tech data on startup")
+    TECH_AUTO_SEED_DEMO: bool = Field(default=False, description="Auto-seed demo tech data on startup")
     TECH_ANALYSIS_START_YEAR: int = Field(default=2019)
     TECH_ANALYSIS_END_YEAR: int = Field(default=2025)
 
@@ -69,3 +72,6 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings() -> Settings:
     return Settings()
+
+
+settings = get_settings()

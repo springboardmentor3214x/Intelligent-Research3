@@ -33,9 +33,14 @@ router = APIRouter(tags=["Module 7 - Member 4 (Maturity, Market Potential & Fund
 
 
 @router.get(
-    "/technologies/{technology_id}/maturity",
+    "/innovation/technology-maturity/{technology_id}",
     response_model=TechnologyMaturityResponse,
-    summary="Get Technology Maturity (Module 6 -> Module 7 15% factor)",
+    summary="Get Technology Maturity Factor (Module 6 -> Module 7 15% factor)",
+)
+@router.get(
+    "/technologies/{technology_id}/maturity-factor",
+    response_model=TechnologyMaturityResponse,
+    summary="Get Technology Maturity Factor (Module 6 -> Module 7 15% factor)",
 )
 def read_technology_maturity(technology_id: str):
     """

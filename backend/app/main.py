@@ -52,25 +52,93 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     init_db()
-    # Seed demo technology data if the database is empty
-    _seed_demo_data()
 
-
-def _seed_demo_data() -> None:
-    """Auto-seed demo technologies on first startup for Module 6."""
-    from app.db.session import SessionLocal
-    from app.models.technology import Technology
-    db = SessionLocal()
+    # Ensure quick-login accounts exist (admin & researcher)
     try:
-        count = db.query(Technology).count()
-        if count == 0:
-            from app.db.seed_technology import seed_demo_technologies
-            n = seed_demo_technologies(db)
-            logger.info("Module 6: Auto-seeded %d demo technologies", n)
-    except Exception as e:
-        logger.error("Module 6: seed failed: %s", e)
-    finally:
-        db.close()
+        from app.db.session import SessionLocal
+        from app.models.user import User, RoleEnum
+        from app.core.security import get_password_hash
+        _db = SessionLocal()
+        _admin = _db.query(User).filter(User.email == "admin@research.org").first()
+        if not _admin:
+            _admin = User(
+                name="System Administrator",
+                email="admin@research.org",
+                password_hash=get_password_hash("Password123!"),
+                role=RoleEnum.ADMINISTRATOR.value,
+                is_active=True,
+                organization="Research Platform",
+                designation="Platform Admin",
+            )
+            _db.add(_admin)
+        _res = _db.query(User).filter(User.email == "researcher@research.org").first()
+        if not _res:
+            _res = User(
+                name="Dr. Alex Rivera",
+                email="researcher@research.org",
+                password_hash=get_password_hash("Password123!"),
+                role=RoleEnum.RESEARCHER.value,
+                is_active=True,
+                organization="Quantum & AI Labs",
+                designation="Lead Researcher",
+            )
+            _db.add(_res)
+        _db.commit()
+        _db.close()
+    except Exception as _e:
+        logger.warning(f"Could not initialize demo accounts: {_e}")
+
+    # Trigger real-time technology data ingestion in background (no demo data)
+    import asyncio, threading
+
+    def _run_initial_sync():
+        """Run real-time sync for popular technologies on first startup."""
+        from app.db.session import SessionLocal
+        from app.models.technology import Technology
+        from app.services.technology_sync_service import sync_technology
+
+        db = SessionLocal()
+        try:
+            count = db.query(Technology).count()
+            if count == 0:
+                logger.info("Module 6: No technologies found — starting real-time data ingestion...")
+                # Default set of technologies to pre-fetch from OpenAlex
+                DEFAULT_TECHNOLOGIES = [
+                    ("Quantum Computing", "Quantum Technology"),
+                    ("Large Language Models", "Artificial Intelligence"),
+                    ("CRISPR Gene Editing", "Biotechnology"),
+                    ("Solid State Battery", "Clean Energy"),
+                    ("Edge AI", "Artificial Intelligence"),
+                    ("Blockchain", "Distributed Systems"),
+                    ("5G Networks", "Telecommunications"),
+                    ("Autonomous Vehicles", "Robotics & Automation"),
+                ]
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                for tech_name, domain in DEFAULT_TECHNOLOGIES:
+                    try:
+                        result = loop.run_until_complete(
+                            sync_technology(db, tech_name, domain=domain, use_demo_fallback=False)
+                        )
+                        logger.info(
+                            "Module 6: Synced '%s' — stage=%s, papers=%s",
+                            tech_name,
+                            result.get("stage"),
+                            result.get("research_papers_total"),
+                        )
+                    except Exception as e:
+                        logger.error("Module 6: Sync failed for '%s': %s", tech_name, e)
+                loop.close()
+            else:
+                logger.info("Module 6: %d technologies already in DB — skipping initial sync", count)
+        except Exception as e:
+            logger.error("Module 6: Initial sync error: %s", e)
+        finally:
+            db.close()
+
+    thread = threading.Thread(target=_run_initial_sync, daemon=True, name="tech-init-sync")
+    thread.start()
+    logger.info("Module 6: Real-time technology sync thread started")
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
@@ -125,6 +193,14 @@ try:
 except Exception as e:
     logger.warning("Could not mount funding router: %s", e)
 
+# ── Module 6 Routers (Technology Intelligence - Sadashiv) ─────────────────────
+try:
+    from app.routers import technologies
+    app.include_router(technologies.router, prefix="/api")
+    app.include_router(technologies.opportunities_router, prefix="/api")
+except Exception as e:
+    logger.warning("Could not mount technology intelligence routers: %s", e)
+
 # ── Module 7 Router (Member 4 Multi-Factor Evaluation) ─────────────────────────
 try:
     from app.routers import module7_member4
@@ -132,13 +208,3 @@ try:
     app.include_router(module7_member4.router, tags=["Module 7 - Member 4"])
 except Exception as e:
     logger.warning("Could not mount module7_member4 router: %s", e)
-
-# ── Module 6 Routers (Technology Intelligence - Sadashiv) ─────────────────────
-try:
-    from app.routers import technologies
-    app.include_router(technologies.router, prefix="/api")
-    app.include_router(technologies.router)
-    app.include_router(technologies.opportunities_router, prefix="/api")
-    app.include_router(technologies.opportunities_router)
-except Exception as e:
-    logger.warning("Could not mount technology intelligence routers: %s", e)

@@ -1,6 +1,7 @@
 from app.models.profile import Patent, Publication, ResearchProfile, ResearchTag
 from app.models.user import RoleEnum, User
 from app.models.research_paper import ResearchPaper
+from app.models.innovation_score import InnovationScore
 
 __all__ = [
     "User",
@@ -10,4 +11,5 @@ __all__ = [
     "Publication",
     "Patent",
     "ResearchPaper",
+    "InnovationScore",
 ]

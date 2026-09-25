@@ -8,8 +8,11 @@ Registers all module routers:
 - Module 4: Funding Opportunities Ingestion
 - Module 6: Technology Intelligence (Sadashiv)
 - Module 7: Multi-factor Evaluation (Member 4)
+- Module 7: Innovation Scoring (Member 5)
 """
+
 import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,6 +32,7 @@ app = FastAPI(
 
 # ── Dynamic CORS Configuration ────────────────────────────────────────────────
 cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+
 for origin in [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -52,7 +56,6 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     init_db()
-    # Seed demo technology data if the database is empty
     _seed_demo_data()
 
 
@@ -60,15 +63,21 @@ def _seed_demo_data() -> None:
     """Auto-seed demo technologies on first startup for Module 6."""
     from app.db.session import SessionLocal
     from app.models.technology import Technology
+
     db = SessionLocal()
+
     try:
         count = db.query(Technology).count()
+
         if count == 0:
             from app.db.seed_technology import seed_demo_technologies
+
             n = seed_demo_technologies(db)
             logger.info("Module 6: Auto-seeded %d demo technologies", n)
+
     except Exception as e:
         logger.error("Module 6: seed failed: %s", e)
+
     finally:
         db.close()
 
@@ -90,55 +99,112 @@ def health_check():
     }
 
 
-# ── Module 1 & 2 Routers (Auth, Users, Profile, Records) ──────────────────────
+# ── Module 1 & 2 Routers ─────────────────────────────────────────────────────
 try:
     from app.routers import auth, profile, records, users
-    # Support both direct (/auth, /users, etc.) and /api prefixes
+
     app.include_router(auth.router)
     app.include_router(auth.router, prefix="/api")
+
     app.include_router(users.router)
     app.include_router(users.router, prefix="/api")
+
     app.include_router(profile.router)
     app.include_router(profile.router, prefix="/api")
+
     if hasattr(records, "publications"):
         app.include_router(records.publications)
         app.include_router(records.publications, prefix="/api")
+
     if hasattr(records, "patents"):
         app.include_router(records.patents)
         app.include_router(records.patents, prefix="/api")
+
 except Exception as e:
     logger.warning("Could not mount auth/profile routers: %s", e)
 
-# ── Module 3 Router (Research Papers) ──────────────────────────────────────────
+
+# ── Module 3 Router ──────────────────────────────────────────────────────────
 try:
     from app.routers import research_papers
+
     app.include_router(research_papers.router, prefix="/api")
     app.include_router(research_papers.router)
+
 except Exception as e:
     logger.warning("Could not mount research_papers router: %s", e)
 
-# ── Module 4 Router (Funding Data Ingestion) ───────────────────────────────────
+
+# ── Module 4 Router ──────────────────────────────────────────────────────────
 try:
     from app.routers import funding
-    app.include_router(funding.router, prefix="/api/funding", tags=["Funding"])
-    app.include_router(funding.router, prefix="/funding", tags=["Funding"])
+
+    app.include_router(
+        funding.router,
+        prefix="/api/funding",
+        tags=["Funding"],
+    )
+    app.include_router(
+        funding.router,
+        prefix="/funding",
+        tags=["Funding"],
+    )
+
 except Exception as e:
     logger.warning("Could not mount funding router: %s", e)
 
-# ── Module 7 Router (Member 4 Multi-Factor Evaluation) ─────────────────────────
-try:
-    from app.routers import module7_member4
-    app.include_router(module7_member4.router, prefix="/api", tags=["Module 7 - Member 4"])
-    app.include_router(module7_member4.router, tags=["Module 7 - Member 4"])
-except Exception as e:
-    logger.warning("Could not mount module7_member4 router: %s", e)
 
-# ── Module 6 Routers (Technology Intelligence - Sadashiv) ─────────────────────
+# ── Module 6 Routers ─────────────────────────────────────────────────────────
 try:
     from app.routers import technologies
+
     app.include_router(technologies.router, prefix="/api")
     app.include_router(technologies.router)
-    app.include_router(technologies.opportunities_router, prefix="/api")
-    app.include_router(technologies.opportunities_router)
+
+    app.include_router(
+        technologies.opportunities_router,
+        prefix="/api",
+    )
+    app.include_router(
+        technologies.opportunities_router
+    )
+
 except Exception as e:
-    logger.warning("Could not mount technology intelligence routers: %s", e)
+    logger.warning(
+        "Could not mount technology intelligence routers: %s",
+        e,
+    )
+
+
+# ── Module 7 Router: Member 4 ────────────────────────────────────────────────
+try:
+    from app.routers import module7_member4
+
+    app.include_router(
+        module7_member4.router,
+        prefix="/api",
+        tags=["Module 7 - Member 4"],
+    )
+    app.include_router(
+        module7_member4.router,
+        tags=["Module 7 - Member 4"],
+    )
+
+except Exception as e:
+    logger.warning(
+        "Could not mount module7_member4 router: %s",
+        e,
+    )
+
+
+# ── Module 7 Router: Member 5 - Innovation Scoring ───────────────────────────
+try:
+    from app.routers import module7_member5
+
+    app.include_router(module7_member5.router)
+
+except Exception as e:
+    logger.warning(
+        "Could not mount module7_member5 router: %s",
+        e,
+    )

@@ -9,7 +9,26 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+      '/auth': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/users': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/profile': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/publications': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/patents': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
       },
     },
   },

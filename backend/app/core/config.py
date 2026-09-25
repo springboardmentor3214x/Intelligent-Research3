@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -34,13 +35,26 @@ class Settings(BaseSettings):
         default="http://127.0.0.1:8000/auth/google/callback"
     )
 
-    # Module 3 — Research Data Ingestion
-    # Optional: provide your e-mail to use OpenAlex polite pool (faster rate limits)
-    # See: https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication
+    # ── Module 3 & 6 — Research Data & OpenAlex (polite pool) ───────────────────
     OPENALEX_MAILTO: str = Field(default="")
 
+    # ── Module 6: Technology Intelligence API Configuration ──────────────────
+    # Semantic Scholar (optional, improves rate limits)
+    SEMANTIC_SCHOLAR_API_KEY: str = Field(default="")
+    # Patent APIs
+    EPO_CLIENT_ID: str = Field(default="")
+    EPO_CLIENT_SECRET: str = Field(default="")
+    PATENT_API_URL: str = Field(default="https://api.patentsview.org/patents/query")
+    # Module 6 feature flags
+    TECH_AUTO_SEED_DEMO: bool = Field(default=True, description="Auto-seed demo tech data on startup")
+    TECH_ANALYSIS_START_YEAR: int = Field(default=2019)
+    TECH_ANALYSIS_END_YEAR: int = Field(default=2025)
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(
+            str(Path(__file__).resolve().parent.parent.parent / ".env"),
+            ".env",
+        ),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"

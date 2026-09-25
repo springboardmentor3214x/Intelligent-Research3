@@ -114,6 +114,14 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/tech-intel/:techId"
+        element={
+          <ProtectedRoute>
+            <TechnologyIntelligencePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/innovation-score"
         element={
           <ProtectedRoute>

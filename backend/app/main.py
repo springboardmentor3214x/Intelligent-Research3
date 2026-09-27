@@ -199,6 +199,18 @@ except Exception as e:
 
 # ── Module 7 Router: Member 5 - Innovation Scoring ───────────────────────────
 try:
+    from app.routers import innovation_router
+
+    app.include_router(innovation_router.router)
+
+except Exception as e:
+    logger.warning(
+        "Could not mount innovation_router: %s",
+        e,
+    )
+
+
+try:
     from app.routers import module7_member5
 
     app.include_router(module7_member5.router)
@@ -208,3 +220,4 @@ except Exception as e:
         "Could not mount module7_member5 router: %s",
         e,
     )
+

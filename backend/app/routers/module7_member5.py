@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.routers.module7_member4 import get_member4_factors_summary
 from app.db.session import get_db
 from app.models.innovation_score import InnovationScore
 from app.schemas.module7_member5 import (
@@ -48,6 +49,7 @@ def calculate_score(
         explanation=result["explanation"],
     )
 
+    db.rollback()
     db.add(innovation_record)
     db.commit()
     db.refresh(innovation_record)
@@ -65,6 +67,8 @@ def calculate_score(
         methodology_version="innovation_v1",
         missing_factors=missing_factors,
     )
+
+
 @router.get(
     "/innovation-score/{technology_id}",
     response_model=InnovationScoreResponse,
@@ -81,8 +85,6 @@ def get_innovation_score(
     )
 
     if record is None:
-        from fastapi import HTTPException
-
         raise HTTPException(
             status_code=404,
             detail="Innovation score not found for this technology.",
@@ -98,7 +100,15 @@ def get_innovation_score(
         innovation_score=record.innovation_score,
         explanation=record.explanation,
         status=record.status,
+        methodology_version=record.methodology_version,
+        missing_factors=(
+            record.missing_factors.split(", ")
+            if record.missing_factors
+            else []
+        ),
     )
+
+
 @router.get(
     "/innovation-score/{technology_id}/breakdown",
 )
@@ -114,8 +124,6 @@ def get_innovation_score_breakdown(
     )
 
     if record is None:
-        from fastapi import HTTPException
-
         raise HTTPException(
             status_code=404,
             detail="Innovation score not found for this technology.",
@@ -148,6 +156,8 @@ def get_innovation_score_breakdown(
         "innovation_score": record.innovation_score,
         "status": record.status,
     }
+
+
 @router.get(
     "/innovation-score/{technology_id}/explanation",
 )
@@ -163,8 +173,6 @@ def get_innovation_score_explanation(
     )
 
     if record is None:
-        from fastapi import HTTPException
-
         raise HTTPException(
             status_code=404,
             detail="Innovation score not found for this technology.",
@@ -176,3 +184,81 @@ def get_innovation_score_explanation(
         "status": record.status,
         "explanation": record.explanation,
     }
+
+
+@router.get(
+    "/innovation-score/{technology_id}/calculate-from-modules",
+    response_model=InnovationScoreResponse,
+)
+def calculate_score_from_modules(
+    technology_id: str,
+    db: Session = Depends(get_db),
+):
+    # Get Member 4 factors
+    member4 = get_member4_factors_summary(
+        technology_id=technology_id,
+        db=db,
+    )
+
+    # Get the latest Member 3 factor scores
+    innovation_record = (
+        db.query(InnovationScore)
+        .filter(InnovationScore.technology_id == technology_id)
+        .order_by(InnovationScore.id.desc())
+        .first()
+    )
+
+    if innovation_record is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Member 3 innovation factors not found for this technology.",
+        )
+
+    # Calculate final Innovation Score using
+    # Member 3 + Member 4 factors
+    result = calculate_innovation_score(
+        research_novelty=innovation_record.research_novelty,
+        patent_strength=innovation_record.patent_strength,
+        technology_maturity=member4.technology_maturity.score,
+        market_potential=member4.market_potential.score,
+        funding_relevance=member4.funding_relevance.score,
+    )
+
+    missing_factors = result.get("missing_factors", [])
+
+    # Update the same innovation record with the final score
+    innovation_record.technology_maturity = (
+        member4.technology_maturity.score
+    )
+    innovation_record.market_potential = (
+        member4.market_potential.score
+    )
+    innovation_record.funding_relevance = (
+        member4.funding_relevance.score
+    )
+    innovation_record.innovation_score = result["innovation_score"]
+    innovation_record.status = result["status"]
+    innovation_record.methodology_version = "innovation_v1"
+    innovation_record.missing_factors = (
+        ", ".join(missing_factors)
+        if missing_factors
+        else None
+    )
+    innovation_record.explanation = result["explanation"]
+
+    db.commit()
+    db.refresh(innovation_record)
+
+    return InnovationScoreResponse(
+        technology_id=technology_id,
+        research_novelty=innovation_record.research_novelty,
+        patent_strength=innovation_record.patent_strength,
+        technology_maturity=innovation_record.technology_maturity,
+        market_potential=innovation_record.market_potential,
+        funding_relevance=innovation_record.funding_relevance,
+        innovation_score=innovation_record.innovation_score,
+        explanation=innovation_record.explanation,
+        status=innovation_record.status,
+        methodology_version=innovation_record.methodology_version,
+        missing_factors=missing_factors,
+    )

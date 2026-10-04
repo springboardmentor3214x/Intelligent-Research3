@@ -8,8 +8,11 @@ Registers all module routers:
 - Module 4: Funding Opportunities Ingestion
 - Module 6: Technology Intelligence (Sadashiv)
 - Module 7: Multi-factor Evaluation (Member 4)
+- Module 7: Innovation Scoring (Member 5)
 """
+
 import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,6 +32,7 @@ app = FastAPI(
 
 # ── Dynamic CORS Configuration ────────────────────────────────────────────────
 cors_origins = [o.strip() for o in settings.CORS_ORIGINS.split(",") if o.strip()]
+
 for origin in [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -204,16 +208,19 @@ def health_check():
     }
 
 
-# ── Module 1 & 2 Routers (Auth, Users, Profile, Records) ──────────────────────
+# ── Module 1 & 2 Routers ─────────────────────────────────────────────────────
 try:
     from app.routers import auth, profile, records, users
-    # Support both direct (/auth, /users, etc.) and /api prefixes
+
     app.include_router(auth.router)
     app.include_router(auth.router, prefix="/api")
+
     app.include_router(users.router)
     app.include_router(users.router, prefix="/api")
+
     app.include_router(profile.router)
     app.include_router(profile.router, prefix="/api")
+
     if hasattr(records, "publications"):
         app.include_router(records.publications)
         app.include_router(records.publications, prefix="/api")
@@ -223,22 +230,39 @@ try:
         app.include_router(patents.router, prefix="/api")
     except Exception as e:
         logger.warning("Could not mount Module 5 patents router: %s", e)
+    if hasattr(records, "patents"):
+        app.include_router(records.patents)
+        app.include_router(records.patents, prefix="/api")
 except Exception as e:
     logger.warning("Could not mount auth/profile routers: %s", e)
 
-# ── Module 3 Router (Research Papers) ──────────────────────────────────────────
+
+# ── Module 3 Router ──────────────────────────────────────────────────────────
 try:
     from app.routers import research_papers
+
     app.include_router(research_papers.router, prefix="/api")
     app.include_router(research_papers.router)
+
 except Exception as e:
     logger.warning("Could not mount research_papers router: %s", e)
 
-# ── Module 4 Router (Funding Data Ingestion) ───────────────────────────────────
+
+# ── Module 4 Router ──────────────────────────────────────────────────────────
 try:
     from app.routers import funding
-    app.include_router(funding.router, prefix="/api/funding", tags=["Funding"])
-    app.include_router(funding.router, prefix="/funding", tags=["Funding"])
+
+    app.include_router(
+        funding.router,
+        prefix="/api/funding",
+        tags=["Funding"],
+    )
+    app.include_router(
+        funding.router,
+        prefix="/funding",
+        tags=["Funding"],
+    )
+
 except Exception as e:
     logger.warning("Could not mount funding router: %s", e)
 

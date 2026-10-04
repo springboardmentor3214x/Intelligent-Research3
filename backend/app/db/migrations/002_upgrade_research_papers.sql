@@ -30,3 +30,4 @@ CREATE INDEX IF NOT EXISTS idx_research_papers_normalized_doi
 
 CREATE INDEX IF NOT EXISTS idx_research_papers_publication_year
     ON research_papers(publication_year);
+

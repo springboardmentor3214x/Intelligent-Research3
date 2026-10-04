@@ -295,4 +295,4 @@ def calculate_score_from_modules(
         status=result["status"],
         methodology_version="innovation_v1",
         missing_factors=missing_factors,
-    )
+    )

@@ -1,6 +1,6 @@
 /**
  * Innovation Score Service – Module 7 Innovation Scoring Engine
- * Frontend API service for deterministic multi-factor innovation evaluation.
+ * Dual-routing API service supporting both Master Engine & Member 5 endpoints.
  */
 
 import { apiRequest } from './api';
@@ -9,7 +9,6 @@ export async function fetchInnovationScore(technologyId) {
   try {
     return await apiRequest(`/api/innovation-score/${encodeURIComponent(technologyId)}`);
   } catch (err) {
-    // Fallback to legacy member5 route if needed
     return await apiRequest(`/api/innovation/innovation-score/${encodeURIComponent(technologyId)}`);
   }
 }
@@ -54,8 +53,15 @@ export async function calculateScoreFromModules(technologyId) {
 }
 
 export async function calculateInnovationScore(payload) {
-  return apiRequest('/api/innovation-score/calculate', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  });
+  try {
+    return await apiRequest('/api/innovation-score/calculate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    return await apiRequest('/api/innovation/innovation-score', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
 }

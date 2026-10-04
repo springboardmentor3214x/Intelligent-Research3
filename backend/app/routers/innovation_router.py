@@ -115,3 +115,4 @@ def patent_strength(
         "factor": "patent_strength",
         **result,
     }
+

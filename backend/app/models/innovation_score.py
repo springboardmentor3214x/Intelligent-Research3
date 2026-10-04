@@ -33,7 +33,6 @@ class InnovationScore(Base):
     lifecycle = Column(String(50), nullable=True)
     factors_data = Column(JSON, nullable=True)
     evidence_data = Column(JSON, nullable=True)
-
     created_at = Column(
         DateTime,
         default=lambda: datetime.now(timezone.utc),

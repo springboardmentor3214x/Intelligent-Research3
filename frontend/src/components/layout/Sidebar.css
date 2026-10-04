@@ -1,68 +1,100 @@
-/* Formal Corporate / Academic Sidebar */
+/* ================================================================
+   Enterprise Sidebar — Clean Light Professional Surface
+   White / Off-White · Slate Borders · Subtle Green Active
+   ================================================================ */
+
 .enterprise-sidebar {
-  width: 260px;
-  min-width: 260px;
+  width: 255px;
+  min-width: 255px;
   height: 100vh;
   position: sticky;
   top: 0;
-  background: #0f172a;
-  border-right: 1px solid #1e293b;
+  background: var(--white);
+  border-right: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
   z-index: 100;
-  transition: transform 0.25s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 1px 0 3px rgba(15, 23, 42, 0.02);
 }
 
+/* ── Brand ── */
 .sidebar-brand {
-  padding: 20px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid #1e293b;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+  background: var(--white);
 }
 
 .brand-logo-hex {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: #1e40af;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--green);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--white);
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.brand-sparkle {
+  color: var(--white);
 }
 
 .brand-info {
   display: flex;
   flex-direction: column;
+  gap: 1px;
 }
 
 .brand-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.01em;
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--charcoal-900);
+  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
+  line-height: 1.2;
 }
 
 .brand-badge {
   font-size: 0.65rem;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--green);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
+/* ── Nav Container ── */
 .sidebar-nav-container {
   flex: 1;
   padding: 16px 12px;
   overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar-nav-container::-webkit-scrollbar { width: 4px; }
+.sidebar-nav-container::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav-container::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 9999px; }
+
+.nav-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .nav-group-label {
-  padding: 0 10px 8px;
-  font-size: 0.68rem;
+  padding: 0 10px 4px;
+  font-size: 0.66rem;
   font-weight: 700;
-  color: #64748b;
+  color: var(--charcoal-500);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -70,48 +102,67 @@
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
+/* ── Nav Link ── */
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 12px;
-  border-radius: 6px;
-  color: #94a3b8;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--charcoal-700);
   text-decoration: none;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition: all 120ms ease;
   position: relative;
+  border: 1px solid transparent;
 }
 
-.sidebar-link:hover:not(.link-disabled) {
-  background: #1e293b;
-  color: #ffffff;
+.sidebar-link:hover:not(.link-active) {
+  background: var(--surface-subtle);
+  color: var(--charcoal-900);
+  border-color: var(--border-light);
 }
 
+/* Active State — Subtle Light Green Treatment */
 .link-active {
-  background: #1e40af !important;
-  color: #ffffff !important;
-  font-weight: 600;
+  background: var(--green-surface-subtle) !important;
+  color: var(--charcoal-900) !important;
+  font-weight: 600 !important;
+  border-color: var(--green-border) !important;
 }
 
 .link-active .link-icon {
-  color: #ffffff;
+  color: var(--green) !important;
 }
 
-.link-disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.link-active .link-chevron {
+  opacity: 1 !important;
+  color: var(--green) !important;
+  transform: translateX(2px);
 }
 
+.link-active .badge-highlight {
+  background: var(--green);
+  color: var(--white);
+  border-color: var(--green);
+}
+
+/* ── Link Parts ── */
 .link-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: var(--charcoal-500);
+  transition: color 120ms ease;
+  flex-shrink: 0;
+}
+
+.sidebar-link:hover .link-icon {
+  color: var(--charcoal-900);
 }
 
 .link-label {
@@ -119,67 +170,80 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.01em;
 }
 
 .link-chevron {
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: opacity 120ms ease, transform 120ms ease;
+  color: var(--charcoal-400);
+  flex-shrink: 0;
 }
 
-.link-active .link-chevron {
-  opacity: 1;
+.sidebar-link:hover .link-chevron {
+  opacity: 0.5;
 }
 
+/* ── Module Badge ── */
 .badge-highlight {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #3b82f6;
-  color: #ffffff;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--surface-subtle);
+  color: var(--charcoal-600);
+  border: 1px solid var(--border-light);
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
-.badge-soon {
-  font-size: 0.65rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #1e293b;
-  color: #64748b;
-  border: 1px solid #334155;
-}
-
+/* ── Footer Info ── */
 .sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid #1e293b;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-light);
+  flex-shrink: 0;
+  background: var(--off-white);
 }
 
 .internship-badge-card {
-  padding: 12px;
-  border-radius: 6px;
-  background: #1e293b;
-  border: 1px solid #334155;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-xs);
 }
 
 .internship-tag {
   display: inline-block;
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   font-weight: 700;
   padding: 2px 6px;
-  border-radius: 4px;
-  background: #0284c7;
-  color: #ffffff;
+  border-radius: var(--radius-xs);
+  background: var(--green-surface);
+  color: var(--green);
   margin-bottom: 4px;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--green-border);
 }
 
 .internship-desc {
   margin: 0;
-  font-size: 0.74rem;
-  color: #94a3b8;
-  line-height: 1.35;
+  font-size: 0.72rem;
+  color: var(--charcoal-600);
+  line-height: 1.4;
 }
 
+/* ── Backdrop (mobile) ── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 95;
+}
+
+/* ── Mobile ── */
 @media (max-width: 1024px) {
   .enterprise-sidebar {
     position: fixed;
@@ -187,18 +251,10 @@
     top: 0;
     bottom: 0;
     transform: translateX(-100%);
-    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
   }
 
   .sidebar-open {
     transform: translateX(0);
-  }
-
-  .sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(3px);
-    z-index: 95;
   }
 }

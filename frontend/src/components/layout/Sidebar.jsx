@@ -3,8 +3,8 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   UserCheck,
-  Search,
   TrendingUp,
+  Search,
   FileKey,
   Cpu,
   Award,
@@ -12,125 +12,172 @@ import {
   Bell,
   FileText,
   Sparkles,
-  ExternalLink,
   ChevronRight,
   BarChart2,
+  ShieldCheck,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 import "./Sidebar.css";
 
 export default function Sidebar({ isOpen, onClose }) {
-  const navItems = [
+  const { role } = useAuth();
+  const isAdmin = role === "admin" || role === "Administrator";
+
+  const navSections = [
     {
-      to: "/dashboard",
-      label: "Dashboard",
-      icon: <LayoutDashboard size={18} />,
-      status: "active"
+      label: "OVERVIEW",
+      items: [
+        {
+          to: "/dashboard",
+          label: "Executive Dashboard",
+          icon: <LayoutDashboard size={18} />,
+        },
+        {
+          to: "/analytics",
+          label: "Analytics & Trends",
+          icon: <BarChart2 size={18} />,
+        },
+      ],
     },
     {
-      to: "/analytics",
-      label: "Analytics",
-      icon: <BarChart2 size={18} />,
-      status: "active",
-      badge: "M9",
+      label: "RESEARCH",
+      items: [
+        {
+          to: "/research-profile",
+          label: "Research Profile",
+          icon: <UserCheck size={18} />,
+        },
+        {
+          to: "/trends",
+          label: "Research Intelligence",
+          icon: <TrendingUp size={18} />,
+        },
+      ],
     },
     {
-      to: "/research-profile",
-      label: "Research Profile",
-      icon: <UserCheck size={18} />,
-      status: "soon"
+      label: "FUNDING",
+      items: [
+        {
+          to: "/funding",
+          label: "Funding Intelligence",
+          icon: <Search size={18} />,
+        },
+      ],
     },
     {
-      to: "/funding",
-      label: "Funding Opportunities",
-      icon: <Search size={18} />,
-      status: "soon"
+      label: "PATENTS",
+      items: [
+        {
+          to: "/patent-intel",
+          label: "Patent Landscape",
+          icon: <FileKey size={18} />,
+        },
+      ],
     },
     {
-      to: "/trends",
-      label: "Research Trends",
-      icon: <TrendingUp size={18} />,
-      status: "soon"
+      label: "TECHNOLOGY",
+      items: [
+        {
+          to: "/tech-intel",
+          label: "Technology Intelligence",
+          icon: <Cpu size={18} />,
+        },
+      ],
     },
     {
-      to: "/patent-intel",
-      label: "Patent Intelligence",
-      icon: <FileKey size={18} />,
-      status: "soon"
+      label: "INNOVATION",
+      items: [
+        {
+          to: "/innovation-score",
+          label: "Innovation Score",
+          icon: <Award size={18} />,
+        },
+        {
+          to: "/commercialization",
+          label: "Commercialization",
+          icon: <DollarSign size={18} />,
+        },
+      ],
     },
     {
-      to: "/tech-intel",
-      label: "Technology Intelligence",
-      icon: <Cpu size={18} />,
-      status: "soon"
+      label: "SYSTEM",
+      items: [
+        {
+          to: "/notifications",
+          label: "Proactive Alerts",
+          icon: <Bell size={18} />,
+        },
+        {
+          to: "/reports",
+          label: "Reports & Dossier",
+          icon: <FileText size={18} />,
+        },
+      ],
     },
-    {
-      to: "/innovation-score",
-      label: "Innovation Score",
-      icon: <Award size={18} />,
-      status: "soon"
-    },
-    {
-      to: "/commercialization",
-      label: "Commercialization",
-      icon: <DollarSign size={18} />,
-      status: "soon"
-    },
-    {
-      to: "/notifications",
-      label: "Notifications",
-      icon: <Bell size={18} />,
-      status: "soon"
-    },
-    {
-      to: "/reports",
-      label: "Reports & Export",
-      icon: <FileText size={18} />,
-      status: "soon"
-    }
   ];
+
+  if (isAdmin) {
+    navSections.push({
+      label: "ADMINISTRATION",
+      items: [
+        {
+          to: "/admin",
+          label: "Platform Governance",
+          icon: <ShieldCheck size={18} />,
+        },
+      ],
+    });
+  }
 
   return (
     <>
       {isOpen && <div className="sidebar-backdrop" onClick={onClose} />}
-      <aside className={`enterprise-sidebar ${isOpen ? "sidebar-open" : ""}`}>
+      <aside className={`enterprise-sidebar ${isOpen ? "sidebar-open" : ""}`} aria-label="Main Navigation">
+        {/* Brand Header */}
         <div className="sidebar-brand">
           <div className="brand-logo-hex">
-            <Sparkles size={20} className="brand-sparkle" />
+            <Sparkles size={18} className="brand-sparkle" />
           </div>
           <div className="brand-info">
             <span className="brand-title">IntelliResearch</span>
-            <span className="brand-badge">Enterprise v2.0</span>
+            <span className="brand-badge">Intelligence Platform</span>
           </div>
         </div>
 
+        {/* Categorized Navigation */}
         <div className="sidebar-nav-container">
-          <div className="nav-group-label">RESEARCH PLATFORM</div>
-          <nav className="sidebar-nav">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "link-active" : ""}`
-                }
-                onClick={() => {
-                  if (onClose) onClose();
-                }}
-              >
-                <span className="link-icon">{item.icon}</span>
-                <span className="link-label">{item.label}</span>
-                {item.badge && <span className="badge-highlight">{item.badge}</span>}
-                {item.status === "soon" && <span className="badge-soon">Preview</span>}
-                <ChevronRight size={14} className="link-chevron" />
-              </NavLink>
-            ))}
-          </nav>
+          {navSections.map((section) => (
+            <div key={section.label} className="nav-group-section">
+              <div className="nav-group-label">{section.label}</div>
+              <nav className="sidebar-nav">
+                {section.items.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    className={({ isActive }) =>
+                      `sidebar-link ${isActive ? "link-active" : ""}`
+                    }
+                    onClick={() => {
+                      if (onClose) onClose();
+                    }}
+                  >
+                    <span className="link-icon">{item.icon}</span>
+                    <span className="link-label">{item.label}</span>
+                    <ChevronRight size={13} className="link-chevron" />
+                  </NavLink>
+                ))}
+              </nav>
+            </div>
+          ))}
         </div>
 
+        {/* Sidebar Info Card */}
         <div className="sidebar-footer">
           <div className="internship-badge-card">
-            <span className="internship-tag">Infosys Internship</span>
-            <p className="internship-desc">AI Research Funding & Innovation Platform</p>
+            <span className="internship-tag">Live Intelligence</span>
+            <p className="internship-desc">
+              Multi-source scientific data connected to federal grant and patent APIs.
+            </p>
           </div>
         </div>
       </aside>

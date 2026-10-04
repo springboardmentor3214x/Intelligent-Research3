@@ -1,7 +1,42 @@
-import { initialResearchProfile } from "../data/mockResearchProfile";
 import { apiRequest } from "./api";
 
 const STORAGE_KEY = "intelligent_research_profile_v2";
+
+const defaultResearchProfile = {
+  id: "RES-NEW",
+  personalInfo: {
+    fullName: "",
+    email: "",
+    researcherType: "Researcher",
+    designation: "",
+    country: "",
+    state: "",
+    city: "",
+    phone: "",
+    photoUrl: "",
+    qualification: "",
+    experienceYears: 0,
+  },
+  organization: {
+    name: "",
+    department: "",
+    laboratory: "",
+    type: "Academic / Research Institution",
+    country: "",
+    city: "",
+  },
+  research: {
+    primaryDomain: "",
+    researchAreas: [],
+    interests: "",
+    summary: "",
+  },
+  keywords: [],
+  technologies: [],
+  publications: [],
+  patents: [],
+  researchHistory: [],
+};
 
 /**
  * Normalizes and binds research profile to the authenticated user.
@@ -22,12 +57,12 @@ export function getStoredProfile(authUser) {
 
     const realName = currentUser?.name?.trim() || parsed?.personalInfo?.fullName || "Researcher";
     const realEmail = currentUser?.email?.trim() || parsed?.personalInfo?.email || "";
-    const realRole = currentUser?.role || parsed?.personalInfo?.researcherType || "Academic Researcher";
+    const realRole = currentUser?.role || parsed?.personalInfo?.researcherType || "Researcher";
     const realId = currentUser?.id || currentUser?.user_id
       ? `RES-${10000 + (currentUser.id || currentUser.user_id)}`
-      : parsed?.id || "RES-10234";
+      : parsed?.id || "RES-10001";
 
-    const base = parsed || initialResearchProfile;
+    const base = parsed || defaultResearchProfile;
 
     const merged = {
       ...base,
@@ -37,47 +72,47 @@ export function getStoredProfile(authUser) {
         fullName: realName,
         email: realEmail,
         researcherType: realRole,
-        designation: currentUser?.designation || base.personalInfo?.designation || "Senior AI Researcher",
-        country: currentUser?.country || base.personalInfo?.country || "India",
-        state: base.personalInfo?.state || "Karnataka",
-        city: base.personalInfo?.city || "Bengaluru",
-        phone: currentUser?.phone || base.personalInfo?.phone || "+91 98765 43210",
+        designation: currentUser?.designation || base.personalInfo?.designation || "",
+        country: currentUser?.country || base.personalInfo?.country || "",
+        state: base.personalInfo?.state || "",
+        city: base.personalInfo?.city || "",
+        phone: currentUser?.phone || base.personalInfo?.phone || "",
         photoUrl: currentUser?.picture || base.personalInfo?.photoUrl || "",
-        qualification: base.personalInfo?.qualification || "Ph.D. in Computer Science & Artificial Intelligence",
-        experienceYears: Number(base.personalInfo?.experienceYears) || 9
+        qualification: base.personalInfo?.qualification || "",
+        experienceYears: Number(base.personalInfo?.experienceYears) || 0,
       },
       organization: {
         ...base.organization,
-        name: currentUser?.organization || base.organization?.name || "National Institute of Advanced Computing",
-        department: currentUser?.department || base.organization?.department || "Artificial Intelligence & Computational Intelligence",
-        laboratory: base.organization?.laboratory || "AI & Cognitive Computing Laboratory",
-        type: base.organization?.type || "Research Institute",
-        country: currentUser?.country || base.organization?.country || "India",
-        city: base.organization?.city || "Bengaluru"
+        name: currentUser?.organization || base.organization?.name || "",
+        department: currentUser?.department || base.organization?.department || "",
+        laboratory: base.organization?.laboratory || "",
+        type: base.organization?.type || "Academic / Research Institution",
+        country: currentUser?.country || base.organization?.country || "",
+        city: base.organization?.city || "",
       },
       research: {
         ...base.research,
-        primaryDomain: currentUser?.research_domain || base.research?.primaryDomain || "Artificial Intelligence",
+        primaryDomain: currentUser?.research_domain || base.research?.primaryDomain || "",
         researchAreas: Array.isArray(currentUser?.research_areas) && currentUser.research_areas.length > 0
           ? currentUser.research_areas
-          : base.research?.researchAreas || ["Machine Learning", "Deep Learning", "Explainable AI", "Predictive Analytics"],
-        interests: base.research?.interests || "Explainable AI, intelligent systems, deep neural architectures, clinical decision support",
-        summary: base.research?.summary || "Dedicated to advancing trustworthy artificial intelligence, transparent deep learning algorithms, and real-world intelligence pipelines."
+          : base.research?.researchAreas || [],
+        interests: base.research?.interests || "",
+        summary: base.research?.summary || "",
       },
       keywords: Array.isArray(currentUser?.research_keywords) && currentUser.research_keywords.length > 0
         ? currentUser.research_keywords
-        : Array.isArray(base.keywords) ? base.keywords : initialResearchProfile.keywords,
-      technologies: Array.isArray(base.technologies) ? base.technologies : initialResearchProfile.technologies,
-      publications: Array.isArray(base.publications) ? base.publications : initialResearchProfile.publications,
-      patents: Array.isArray(base.patents) ? base.patents : initialResearchProfile.patents,
-      researchHistory: Array.isArray(base.researchHistory) ? base.researchHistory : initialResearchProfile.researchHistory
+        : Array.isArray(base.keywords) ? base.keywords : [],
+      technologies: Array.isArray(base.technologies) ? base.technologies : [],
+      publications: Array.isArray(base.publications) ? base.publications : [],
+      patents: Array.isArray(base.patents) ? base.patents : [],
+      researchHistory: Array.isArray(base.researchHistory) ? base.researchHistory : [],
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
     return merged;
   } catch (err) {
     console.error("Error loading profile:", err);
-    return initialResearchProfile;
+    return defaultResearchProfile;
   }
 }
 

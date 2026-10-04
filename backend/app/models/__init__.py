@@ -27,10 +27,21 @@ try:
 except Exception:
     pass
 
+try:
+    from app.models.notification import (
+        Notification,
+        NotificationCategory,
+        NotificationPreference,
+        NotificationPriority,
+    )
+except Exception:
+    pass
+
 __all__ = [
     "User", "RoleEnum", "ResearchProfile", "ResearchTag", "Publication", "Patent",
     "FundingOpportunity",
     "Technology", "TechnologyMetric", "TechnologyTrend",
     "TechnologyMaturity", "TechnologyOpportunity", "TechnologyCompetitor", "DataSourceLog",
     "InnovationScore", "CommercializationRecommendation",
+    "Notification", "NotificationPreference", "NotificationCategory", "NotificationPriority",
 ]

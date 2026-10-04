@@ -1,0 +1,166 @@
+/* ================================================================
+   Enterprise Footer — Clean Light Professional Surface
+   ================================================================ */
+
+.enterprise-footer {
+  background: var(--white);
+  border-top: 1px solid var(--border-light);
+  margin-top: auto;
+  font-family: var(--font-body);
+}
+
+.footer-inner {
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 32px 32px 24px;
+  display: grid;
+  grid-template-columns: 1.4fr 2fr;
+  gap: 48px;
+}
+
+.footer-brand-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-logo-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--green-surface);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.footer-platform-name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--charcoal-900);
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+.footer-platform-tagline {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--green);
+  letter-spacing: 0.02em;
+}
+
+.footer-platform-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--charcoal-600);
+  line-height: 1.5;
+  max-width: 440px;
+}
+
+.footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.footer-col-title {
+  margin: 0 0 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--charcoal-800);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.footer-col-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-col-links li a {
+  color: var(--charcoal-600);
+  font-size: 0.82rem;
+  transition: color var(--t-fast);
+}
+
+.footer-col-links li a:hover {
+  color: var(--green);
+}
+
+.footer-provenance-item,
+.footer-security-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--charcoal-600);
+}
+
+.footer-bottom-bar {
+  border-top: 1px solid var(--border-light);
+  background: var(--off-white);
+  padding: 14px 32px;
+}
+
+.footer-bottom-inner {
+  max-width: 1480px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-copyright {
+  font-size: 0.76rem;
+  color: var(--charcoal-500);
+}
+
+.footer-meta-tags {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.footer-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--green);
+}
+
+@media (max-width: 1024px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-links-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .footer-inner,
+  .footer-bottom-bar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

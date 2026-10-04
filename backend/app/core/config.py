@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # Module 6 & Gemini AI Intelligence
     GEMINI_API_KEY: str = Field(default="")
     GOOGLE_API_KEY: str = Field(default="")
+    OPENAI_API_KEY: str = Field(default="")
     SEMANTIC_SCHOLAR_API_KEY: str = Field(default="")
     # Patent APIs
     EPO_CLIENT_ID: str = Field(default="")

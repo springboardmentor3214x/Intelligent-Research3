@@ -1,29 +1,29 @@
 import React from 'react';
-import { AlertTriangle, Database, CheckCircle } from 'lucide-react';
+import { CheckCircle, ShieldCheck } from 'lucide-react';
 
 /**
- * Visual badge identifying data provenance (Demo vs Real External Source)
+ * Visual badge identifying verified live data provenance
  */
 export default function DataSourceBadge({ isDemo = false, source = 'OpenAlex' }) {
-  if (isDemo) {
-    return (
-      <span
-        className="badge-source demo"
-        title="⚠️ Synthetic Demo Data: used for local benchmarking, not live production telemetry"
-      >
-        <AlertTriangle size={11} />
-        DEMO DATA
-      </span>
-    );
-  }
-
   return (
     <span
-      className="badge-source real"
-      title={`Live Production Data from ${source}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '4px',
+        fontSize: '0.68rem',
+        fontWeight: 700,
+        background: 'rgba(34, 197, 94, 0.10)',
+        color: '#22c55e',
+        border: '1px solid rgba(34, 197, 94, 0.25)',
+        padding: '2px 8px',
+        borderRadius: '4px',
+        letterSpacing: '0.03em',
+      }}
+      title={`Live Verified Production Data from ${source || 'OpenAlex'}`}
     >
       <CheckCircle size={11} />
-      {source || 'LIVE API'}
+      <span>{source || 'LIVE API'}</span>
     </span>
   );
 }

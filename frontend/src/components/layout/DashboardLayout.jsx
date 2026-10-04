@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Sidebar from "./Sidebar";
 import TopNav from "./TopNav";
+import Footer from "./Footer";
 import "./DashboardLayout.css";
 
 export default function DashboardLayout({ children, pageTitle, breadcrumbs }) {
@@ -16,6 +17,7 @@ export default function DashboardLayout({ children, pageTitle, breadcrumbs }) {
           onToggleSidebar={() => setSidebarOpen((prev) => !prev)}
         />
         <main className="enterprise-content-area">{children}</main>
+        <Footer />
       </div>
     </div>
   );

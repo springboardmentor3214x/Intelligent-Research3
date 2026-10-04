@@ -17,19 +17,7 @@ import ReportsExportPage from '../pages/modules/ReportsExportPage';
 import AnalyticsDashboard from '../pages/modules/AnalyticsDashboard';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import ProtectedRoute from './ProtectedRoute';
-
-function AdminPage() {
-  return (
-    <DashboardLayout pageTitle="Admin Control Panel" breadcrumbs={["Platform Administration", "Control Panel"]}>
-      <div className="enterprise-panel">
-        <h2 style={{ margin: '0 0 8px', color: '#0f172a' }}>⚙ Platform Administration</h2>
-        <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
-          Manage user permissions, institutional access, API rate limits, and audit logs.
-        </p>
-      </div>
-    </DashboardLayout>
-  );
-}
+import AdminPage from '../pages/AdminPage';
 
 export default function AppRoutes() {
   const { isAuthenticated } = useAuth();

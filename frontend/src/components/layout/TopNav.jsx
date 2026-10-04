@@ -8,18 +8,26 @@ import {
   User,
   Shield,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Search,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import NotificationDropdown from "./NotificationDropdown";
 import "./TopNav.css";
 
-export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = ["Research Intelligence", "Research Profile"], onToggleSidebar }) {
+export default function TopNav({
+  pageTitle = "Research Profile",
+  breadcrumbs = ["Research Intelligence", "Research Profile"],
+  onToggleSidebar,
+}) {
   const { user, role, logout } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
 
-  const displayName = user?.name || user?.email?.split("@")[0] || "Dr. Priya Sharma";
+  const displayName =
+    user?.name || (user?.email ? user.email.split("@")[0] : "Authenticated User");
   const userRole = role || "Researcher";
   const initials = displayName
     .split(" ")
@@ -43,8 +51,14 @@ export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = [
     navigate("/login");
   }
 
+  function handleGlobalSearch(e) {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      navigate(`/trends?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  }
+
   return (
-    <header className="enterprise-topnav">
+    <header className="enterprise-topnav" role="banner">
       <div className="topnav-left">
         <button
           type="button"
@@ -52,7 +66,7 @@ export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = [
           onClick={onToggleSidebar}
           aria-label="Toggle navigation menu"
         >
-          <Menu size={20} />
+          <Menu size={18} />
         </button>
 
         <div className="topnav-breadcrumbs-wrap">
@@ -60,7 +74,13 @@ export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = [
             {breadcrumbs.map((crumb, idx) => (
               <React.Fragment key={crumb}>
                 {idx > 0 && <span className="breadcrumb-separator">/</span>}
-                <span className={idx === breadcrumbs.length - 1 ? "breadcrumb-current" : "breadcrumb-parent"}>
+                <span
+                  className={
+                    idx === breadcrumbs.length - 1
+                      ? "breadcrumb-current"
+                      : "breadcrumb-parent"
+                  }
+                >
                   {crumb}
                 </span>
               </React.Fragment>
@@ -70,13 +90,31 @@ export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = [
         </div>
       </div>
 
-      <div className="topnav-right">
-        <button type="button" className="topnav-action-btn" title="Platform Notifications">
-          <Bell size={18} />
-          <span className="notification-dot" />
-        </button>
+      <div className="topnav-center">
+        <div className="topnav-global-search">
+          <Search size={15} className="global-search-icon" />
+          <input
+            type="text"
+            className="global-search-input"
+            placeholder="Search papers, technologies, patents, grants... (Press Enter)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={handleGlobalSearch}
+            aria-label="Global platform search"
+          />
+        </div>
+      </div>
 
-        <button type="button" className="topnav-action-btn" title="Documentation & Guidance">
+      <div className="topnav-right">
+        <NotificationDropdown />
+
+        <button
+          type="button"
+          className="topnav-action-btn"
+          title="Platform Guidance & Documentation"
+          onClick={() => navigate("/reports")}
+          aria-label="Documentation"
+        >
           <HelpCircle size={18} />
         </button>
 
@@ -86,20 +124,25 @@ export default function TopNav({ pageTitle = "Research Profile", breadcrumbs = [
             className="user-profile-button"
             onClick={() => setDropdownOpen((prev) => !prev)}
             aria-expanded={dropdownOpen}
+            aria-label="User profile menu"
           >
             <div className="user-avatar-circle">{initials}</div>
             <div className="user-text-info">
               <span className="user-name-text">{displayName}</span>
               <span className="user-role-badge">{userRole}</span>
             </div>
-            <ChevronDown size={14} className={`dropdown-caret ${dropdownOpen ? "caret-up" : ""}`} />
+            <ChevronDown
+              size={13}
+              className={`dropdown-caret ${dropdownOpen ? "caret-up" : ""}`}
+            />
           </button>
 
           {dropdownOpen && (
-            <div className="topnav-dropdown animate-fade-in">
+            <div className="topnav-dropdown animate-fade">
               <div className="dropdown-user-header">
                 <strong>{displayName}</strong>
-                <small>{user?.email || "priya.sharma@research.org"}</small>
+                <small>{user?.email || "Authenticated Account"}</small>
+                <span className="dropdown-role-tag">{userRole}</span>
               </div>
               <div className="dropdown-divider" />
               <Link

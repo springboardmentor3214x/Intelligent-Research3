@@ -50,9 +50,9 @@
 
 .an-role-badge {
   display: inline-block;
-  background: linear-gradient(135deg, hsl(230, 85%, 60%, 0.2), hsl(270, 75%, 65%, 0.2));
-  color: hsl(230, 85%, 80%);
-  border: 1px solid hsl(230, 85%, 60%, 0.3);
+  background: rgba(34,197,94,0.10);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.22);
   border-radius: var(--radius-full);
   padding: 1px 10px;
   font-size: 0.75rem;
@@ -94,8 +94,9 @@
 }
 
 .an-range-btn.active {
-  background: var(--clr-primary);
-  color: #fff;
+  background: #22c55e;
+  color: #000000;
+  font-weight: 700;
 }
 
 .an-refresh-btn {
@@ -158,9 +159,9 @@
 }
 
 .an-nav-tab.active {
-  background: var(--clr-primary);
-  color: #fff;
-  box-shadow: 0 2px 8px hsl(230, 85%, 60%, 0.3);
+  background: rgba(34,197,94,0.12);
+  color: #22c55e;
+  border: 1px solid rgba(34,197,94,0.22);
 }
 
 /* ── Section content area ─────────────────────────────────────────── */
@@ -205,14 +206,14 @@
   height: 2px;
 }
 
-.an-kpi-card.accent-blue::before  { background: linear-gradient(90deg, #6366f1, #3b82f6); }
-.an-kpi-card.accent-cyan::before  { background: linear-gradient(90deg, #22d3ee, #06b6d4); }
-.an-kpi-card.accent-amber::before { background: linear-gradient(90deg, #f59e0b, #d97706); }
-.an-kpi-card.accent-emerald::before { background: linear-gradient(90deg, #10b981, #059669); }
-.an-kpi-card.accent-purple::before { background: linear-gradient(90deg, #8b5cf6, #7c3aed); }
-.an-kpi-card.accent-rose::before  { background: linear-gradient(90deg, #f43f5e, #e11d48); }
-.an-kpi-card.accent-indigo::before { background: linear-gradient(90deg, #818cf8, #6366f1); }
-.an-kpi-card.accent-orange::before { background: linear-gradient(90deg, #fb923c, #f97316); }
+.an-kpi-card.accent-blue::before    { background: #60a5fa; }
+.an-kpi-card.accent-cyan::before    { background: #22d3ee; }
+.an-kpi-card.accent-amber::before   { background: #f59e0b; }
+.an-kpi-card.accent-emerald::before { background: #22c55e; }
+.an-kpi-card.accent-purple::before  { background: #a78bfa; }
+.an-kpi-card.accent-rose::before    { background: #f87171; }
+.an-kpi-card.accent-indigo::before  { background: #818cf8; }
+.an-kpi-card.accent-orange::before  { background: #fb923c; }
 
 .an-kpi-card:hover {
   border-color: var(--clr-border-focus);

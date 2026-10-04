@@ -131,14 +131,46 @@ def startup() -> None:
                 loop.close()
             else:
                 logger.info("Module 6: %d technologies already in DB — skipping initial sync", count)
+
+            # Ensure Module 4 Funding opportunities exist via live NIH RePORTER
+            from app.models.funding import FundingOpportunity
+            from app.services.funding_ingestion import run_ingestion
+            from app.services.funding_sources.nih_reporter_client import NIHReporterClient
+            funding_count = db.query(FundingOpportunity).count()
+            if funding_count == 0:
+                logger.info("Module 4: Fetching live funding grants from NIH RePORTER...")
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    f_client = NIHReporterClient()
+                    loop.run_until_complete(
+                        run_ingestion(db, f_client, ["artificial intelligence", "machine learning", "cancer", "biomedical"], limit=15)
+                    )
+                except Exception as fe:
+                    logger.warning("Module 4: Background funding sync: %s", fe)
+                finally:
+                    loop.close()
+
+            # Ensure Module 3 Research Papers exist via live OpenAlex
+            from app.models.research_paper import ResearchPaper
+            from app.services.research_ingestion_service import ResearchIngestionService
+            papers_count = db.query(ResearchPaper).count()
+            if papers_count == 0:
+                logger.info("Module 3: Ingesting live research papers from OpenAlex...")
+                try:
+                    r_service = ResearchIngestionService()
+                    r_service.run_sync(db, query="Artificial Intelligence", per_page=15)
+                except Exception as re_err:
+                    logger.warning("Module 3: Background papers sync: %s", re_err)
+
         except Exception as e:
-            logger.error("Module 6: Initial sync error: %s", e)
+            logger.error("Initial data sync error: %s", e)
         finally:
             db.close()
 
-    thread = threading.Thread(target=_run_initial_sync, daemon=True, name="tech-init-sync")
+    thread = threading.Thread(target=_run_initial_sync, daemon=True, name="platform-init-sync")
     thread.start()
-    logger.info("Module 6: Real-time technology sync thread started")
+    logger.info("Real-time background sync thread started")
 
 
 # ── Health check ──────────────────────────────────────────────────────────────
@@ -150,11 +182,25 @@ def read_root():
     }
 
 
+@app.get("/api/health", tags=["Health"])
 @app.get("/health", tags=["Health"])
 def health_check():
+    db_status = "connected"
+    try:
+        from app.db.session import SessionLocal
+        from sqlalchemy import text
+        _db = SessionLocal()
+        _db.execute(text("SELECT 1"))
+        _db.close()
+    except Exception as e:
+        db_status = f"unreachable ({e.__class__.__name__})"
+
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "connected" else "degraded",
         "service": "backend",
+        "database": db_status,
+        "environment": settings.APP_ENV,
+        "modules": "1-10",
     }
 
 
@@ -171,9 +217,12 @@ try:
     if hasattr(records, "publications"):
         app.include_router(records.publications)
         app.include_router(records.publications, prefix="/api")
-    if hasattr(records, "patents"):
-        app.include_router(records.patents)
-        app.include_router(records.patents, prefix="/api")
+    try:
+        from app.routers import patents
+        app.include_router(patents.router)
+        app.include_router(patents.router, prefix="/api")
+    except Exception as e:
+        logger.warning("Could not mount Module 5 patents router: %s", e)
 except Exception as e:
     logger.warning("Could not mount auth/profile routers: %s", e)
 
@@ -244,4 +293,13 @@ try:
     logger.info("Module 9: Dashboard & Analytics router mounted at /api/dashboard")
 except Exception as e:
     logger.warning("Could not mount dashboard router: %s", e)
+
+# ── Module 10 Notification & Alert System Router ───────────────────────────────
+try:
+    from app.routers import notifications
+    app.include_router(notifications.router, prefix="/api", tags=["Module 10 - Notifications & Alerts"])
+    app.include_router(notifications.router, tags=["Module 10 - Notifications & Alerts"])
+    logger.info("Module 10: Notification & Alert System router mounted at /api/notifications")
+except Exception as e:
+    logger.warning("Could not mount notifications router: %s", e)
 

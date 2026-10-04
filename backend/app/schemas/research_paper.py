@@ -6,10 +6,11 @@ These schemas are used:
   - By Member 2 to query/read ingested papers via API
 """
 
+import json
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ResearchPaperBase(BaseModel):
@@ -26,6 +27,18 @@ class ResearchPaperBase(BaseModel):
     research_area: list[str] = Field(default_factory=list)
     source_url: str | None = Field(default=None, max_length=2000)
     open_access_url: str | None = Field(default=None, max_length=2000)
+
+    @field_validator("authors", "keywords", "research_area", mode="before")
+    @classmethod
+    def parse_json_lists(cls, v):
+        if isinstance(v, str):
+            try:
+                parsed = json.loads(v)
+                if isinstance(parsed, list):
+                    return parsed
+            except Exception:
+                return [v] if v else []
+        return v or []
 
 
 class ResearchPaperCreate(ResearchPaperBase):

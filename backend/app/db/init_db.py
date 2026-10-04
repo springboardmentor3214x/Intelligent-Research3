@@ -17,6 +17,10 @@ try:
     from app.models import funding  # noqa: F401 — registers funding_opportunities table
 except Exception:
     pass
+try:
+    from app.models import notification  # noqa: F401 — registers notifications table
+except Exception:
+    pass
 
 
 def init_db() -> None:

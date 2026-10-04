@@ -1,25 +1,11 @@
 """
-Normalization Service – Module 6 Technology Intelligence
+Normalization Service – Module 6 Technology Intelligence & Module 7 Innovation Scoring
 
 Normalizes raw metric values (papers, patents, orgs, applications)
-to 0–100 scores for use in the weighted maturity calculation.
-
-Method: Min-Max normalization across the full technology dataset.
-
-Formula:
-    normalized = ((value - min) / (max - min)) * 100
-
-If all technologies have the same value (min == max), assign 50.
-
-Why this method:
-- Explainable: every score is relative to what's observed in the dataset
-- No arbitrary thresholds like "1000 papers = 50 points"
-- Updates automatically as more technologies are added
-
-Growth normalization uses the same approach applied to average growth rates.
+to 0–100 scores for use in the weighted maturity and innovation calculations.
 """
 from __future__ import annotations
-from typing import Optional
+from typing import List, Optional
 
 
 def normalize_value(
@@ -110,3 +96,26 @@ def normalize_technology(
         "research_growth_score": _norm(tech_data.get("avg_research_growth"), "research_growth"),
         "patent_growth_score": _norm(tech_data.get("avg_patent_growth"), "patent_growth"),
     }
+
+
+# ── Module 7 Normalization Helpers (Member 3 / Gopi) ───────────────────────────
+
+def percentile_score(value: float, reference_values: List[float]) -> Optional[float]:
+    """
+    Returns what percentage of `reference_values` this value is >= to.
+    Example: percentile_score(800, [10, 50, 200, 800, 2000]) -> 60.0
+    """
+    if not reference_values:
+        return None
+    count = sum(1 for v in reference_values if v <= value)
+    return (count / len(reference_values)) * 100.0
+
+
+def min_max_score(value: float, min_value: float, max_value: float) -> float:
+    """
+    Simple linear scaling into 0-100 given a known/documented reference range.
+    """
+    if max_value == min_value:
+        return 50.0  # can't distinguish - stay neutral, don't fake precision
+    normalized = (value - min_value) / (max_value - min_value) * 100.0
+    return max(0.0, min(100.0, normalized))

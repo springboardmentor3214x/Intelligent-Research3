@@ -164,7 +164,14 @@ def _upsert_record(
     for field in _UPDATABLE_FIELDS:
         new_val = getattr(data, field, None)
         old_val = getattr(existing, field, None)
-        if new_val != old_val and new_val is not None:
+        if isinstance(new_val, datetime) and isinstance(old_val, datetime):
+            nv_cmp = new_val.replace(tzinfo=None) if new_val.tzinfo else new_val
+            ov_cmp = old_val.replace(tzinfo=None) if old_val.tzinfo else old_val
+            field_changed = (nv_cmp != ov_cmp)
+        else:
+            field_changed = (new_val != old_val)
+
+        if field_changed and new_val is not None:
             setattr(existing, field, new_val)
             changed = True
 

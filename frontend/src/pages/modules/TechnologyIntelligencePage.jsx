@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import {
   fetchTechnologies,
@@ -44,9 +44,12 @@ import {
   X,
   Database,
   Globe,
+  Award,
+  Rocket,
 } from 'lucide-react';
 
 export default function TechnologyIntelligencePage() {
+  const navigate = useNavigate();
   const { techId: routeTechId } = useParams();
 
   // Navigation & State
@@ -706,7 +709,7 @@ export default function TechnologyIntelligencePage() {
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                       <button
                         className="tech-btn tech-btn-secondary"
                         onClick={handleSyncData}
@@ -715,6 +718,28 @@ export default function TechnologyIntelligencePage() {
                       >
                         <RefreshCw size={13} className={isSyncing ? 'spinning' : ''} />
                         {isSyncing ? 'Syncing...' : 'Sync Data'}
+                      </button>
+
+                      {/* Cross-Module Navigation: M6 → M7 */}
+                      <button
+                        className="tech-btn tech-btn-primary"
+                        title="Evaluate innovation score for this technology in Module 7"
+                        onClick={() => navigate(`/innovation-score?tech=${encodeURIComponent(selectedTechId)}`)}
+                        style={{ background: 'linear-gradient(135deg, #2563eb, #1d4ed8)', color: '#fff' }}
+                      >
+                        <Award size={13} />
+                        Innovation Score (M7)
+                      </button>
+
+                      {/* Cross-Module Navigation: M6 → M8 */}
+                      <button
+                        className="tech-btn"
+                        title="View commercialization pathways for this technology in Module 8"
+                        onClick={() => navigate(`/commercialization?tech=${encodeURIComponent(selectedTechId)}`)}
+                        style={{ background: 'linear-gradient(135deg, #059669, #047857)', color: '#fff', border: 'none' }}
+                      >
+                        <Rocket size={13} />
+                        Commercialize (M8)
                       </button>
                     </div>
                   </div>

@@ -201,10 +201,47 @@ try:
 except Exception as e:
     logger.warning("Could not mount technology intelligence routers: %s", e)
 
-# ── Module 7 Router (Member 4 Multi-Factor Evaluation) ─────────────────────────
+# ── Module 7 Routers ───────────────────────────────────────────────────────────
 try:
     from app.routers import module7_member4
     app.include_router(module7_member4.router, prefix="/api", tags=["Module 7 - Member 4"])
     app.include_router(module7_member4.router, tags=["Module 7 - Member 4"])
 except Exception as e:
     logger.warning("Could not mount module7_member4 router: %s", e)
+
+try:
+    from app.routers import module7_member5
+    app.include_router(module7_member5.router, tags=["Module 7 - Innovation Scoring"])
+except Exception as e:
+    logger.warning("Could not mount module7_member5 router: %s", e)
+
+try:
+    from app.routers import innovation_router
+    app.include_router(innovation_router.router, tags=["Module 7 - Research Novelty & Patent Strength"])
+except Exception as e:
+    logger.warning("Could not mount innovation_router: %s", e)
+
+# ── Module 7 Master Innovation Scoring Router ──────────────────────────────────
+try:
+    from app.routers import innovation_score_engine
+    app.include_router(innovation_score_engine.router, prefix="/api", tags=["Module 7 - Innovation Scoring Engine"])
+    app.include_router(innovation_score_engine.router, tags=["Module 7 - Innovation Scoring Engine"])
+except Exception as e:
+    logger.warning("Could not mount innovation_score_engine router: %s", e)
+
+# ── Module 8 Commercialization Recommendation Router ───────────────────────────
+try:
+    from app.routers import commercialization_engine
+    app.include_router(commercialization_engine.router, prefix="/api", tags=["Module 8 - Commercialization Recommendation Engine"])
+    app.include_router(commercialization_engine.router, tags=["Module 8 - Commercialization Recommendation Engine"])
+except Exception as e:
+    logger.warning("Could not mount commercialization_engine router: %s", e)
+
+# ── Module 9 Dashboard & Analytics Router ──────────────────────────────────────
+try:
+    from app.routers import dashboard
+    app.include_router(dashboard.router, prefix="/api", tags=["Module 9 - Dashboard & Analytics"])
+    logger.info("Module 9: Dashboard & Analytics router mounted at /api/dashboard")
+except Exception as e:
+    logger.warning("Could not mount dashboard router: %s", e)
+

@@ -14,6 +14,7 @@ import InnovationScorePage from '../pages/modules/InnovationScorePage';
 import CommercializationPage from '../pages/modules/CommercializationPage';
 import NotificationsPage from '../pages/modules/NotificationsPage';
 import ReportsExportPage from '../pages/modules/ReportsExportPage';
+import AnalyticsDashboard from '../pages/modules/AnalyticsDashboard';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import ProtectedRoute from './ProtectedRoute';
 
@@ -150,6 +151,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ReportsExportPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <AnalyticsDashboard />
           </ProtectedRoute>
         }
       />

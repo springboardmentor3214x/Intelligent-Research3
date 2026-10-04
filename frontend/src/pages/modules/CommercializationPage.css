@@ -1,0 +1,539 @@
+/* ================================================================
+   Module 8: Commercialization Recommendation Engine Styles
+   Clean Professional Light-Blue / White Enterprise Dashboard Theme
+   Palette:
+     Page Background: #F5F8FC
+     Card Background: #FFFFFF
+     Primary Blue:    #2563EB
+     Light Blue:      #EFF6FF
+     Text Primary:    #172033
+     Text Secondary:  #64748B
+     Borders:         #E2E8F0
+     Success/Emerald: #10B981
+   ================================================================ */
+
+.commercialization-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+  background: #F5F8FC;
+  border-radius: 16px;
+  min-height: 100%;
+}
+
+/* Header & Technology Selector */
+.comm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.comm-header-title {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #172033;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.comm-header-subtitle {
+  color: #64748B;
+  font-size: 0.95rem;
+  max-width: 780px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.comm-purpose-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.comm-purpose-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  color: #1D4ED8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* Dual Metric Hero Strip */
+.comm-dual-hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.metric-hero-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.metric-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.metric-hero-card.highlight-blue {
+  border-left: 4px solid #2563EB;
+}
+
+.metric-hero-card.highlight-emerald {
+  border-left: 4px solid #10B981;
+}
+
+.metric-hero-card.highlight-purple {
+  border-left: 4px solid #8B5CF6;
+}
+
+.metric-hero-card.highlight-amber {
+  border-left: 4px solid #F59E0B;
+}
+
+.metric-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #64748B;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-hero-val {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #172033;
+  margin: 10px 0 4px;
+  letter-spacing: -0.5px;
+}
+
+.metric-hero-desc {
+  font-size: 0.8rem;
+  color: #64748B;
+}
+
+/* Strategic Synthesis Narrative */
+.insight-narrative-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.insight-narrative-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #172033;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.insight-narrative-text {
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Four Core Commercialization Pathway Cards */
+.pathway-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.pathway-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: all 150ms ease;
+}
+
+.pathway-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.pathway-card.prod:hover {
+  border-color: #93C5FD;
+}
+
+.pathway-card.lic:hover {
+  border-color: #A7F3D0;
+}
+
+.pathway-card.start:hover {
+  border-color: #DDD6FE;
+}
+
+.pathway-card.part:hover {
+  border-color: #FDE68A;
+}
+
+.pathway-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.pathway-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #172033;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pathway-score-badge {
+  font-size: 0.88rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 8px;
+}
+
+.pathway-card.prod .pathway-score-badge {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+}
+
+.pathway-card.lic .pathway-score-badge {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #047857;
+}
+
+.pathway-card.start .pathway-score-badge {
+  background: #F5F3FF;
+  border: 1px solid #DDD6FE;
+  color: #6D28D9;
+}
+
+.pathway-card.part .pathway-score-badge {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #B45309;
+}
+
+.pathway-summary {
+  color: #475569;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.pathway-evidence-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pathway-evidence-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.pathway-card-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #172033;
+  font-weight: 600;
+  font-size: 0.82rem;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  margin-top: 10px;
+}
+
+.pathway-card-action:hover {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
+
+/* Comparison Matrix & Tables */
+.comparison-panel {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.comparison-table-wrapper {
+  overflow-x: auto;
+  margin-top: 14px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.comparison-table th {
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 14px;
+}
+
+.comparison-table td {
+  border-bottom: 1px solid #F1F5F9;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.comparison-table tbody tr:hover td {
+  background: #F8FAFC;
+}
+
+/* Deep-Dive Pathway Detail Tabs */
+.deep-dive-panel {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.deep-dive-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #E2E8F0;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #64748B;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.tab-btn:hover {
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.tab-btn.active {
+  background: #EFF6FF;
+  border-color: #BFDBFE;
+  color: #1D4ED8;
+}
+
+/* Entity Cards in Deep Dive */
+.entity-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.entity-card {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entity-card-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #172033;
+}
+
+.entity-card-meta {
+  font-size: 0.8rem;
+  color: #64748B;
+}
+
+/* Commercialization Gap Cards */
+.gap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.gap-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.gap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.gap-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #172033;
+}
+
+.badge-severity-high {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.badge-severity-med {
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  color: #92400E;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.badge-severity-low {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+/* Commercialization Roadmap Timeline */
+.roadmap-timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.roadmap-phase-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.roadmap-phase-num {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1D4ED8;
+  background: #EFF6FF;
+  border: 1px solid #DBEAFE;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: 6px;
+}
+
+.roadmap-phase-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #172033;
+  margin-bottom: 4px;
+}
+
+.roadmap-phase-time {
+  font-size: 0.8rem;
+  color: #64748B;
+  margin-bottom: 12px;
+}
+
+.roadmap-milestones-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.roadmap-milestone-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.4;
+}

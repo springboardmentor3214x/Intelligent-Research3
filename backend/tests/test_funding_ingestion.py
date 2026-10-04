@@ -33,7 +33,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.database import Base
+from app.db.base import Base
 from app.models.funding import FundingOpportunity
 from app.schemas.funding import FundingOpportunityCreate, IngestionSummary
 from app.services.funding_ingestion import run_ingestion

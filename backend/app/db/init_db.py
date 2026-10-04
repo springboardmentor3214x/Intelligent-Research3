@@ -5,6 +5,18 @@ try:
     from app.models import research_paper  # noqa: F401 — registers research_papers table
 except Exception:
     pass
+try:
+    from app.models import innovation_score  # noqa: F401 — registers innovation_scores table
+except Exception:
+    pass
+try:
+    from app.models import commercialization  # noqa: F401 — registers commercialization table
+except Exception:
+    pass
+try:
+    from app.models import funding  # noqa: F401 — registers funding_opportunities table
+except Exception:
+    pass
 
 
 def init_db() -> None:

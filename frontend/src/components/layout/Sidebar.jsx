@@ -13,7 +13,8 @@ import {
   FileText,
   Sparkles,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  BarChart2,
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -26,11 +27,17 @@ export default function Sidebar({ isOpen, onClose }) {
       status: "active"
     },
     {
+      to: "/analytics",
+      label: "Analytics",
+      icon: <BarChart2 size={18} />,
+      status: "active",
+      badge: "M9",
+    },
+    {
       to: "/research-profile",
       label: "Research Profile",
       icon: <UserCheck size={18} />,
-      status: "active",
-      badge: "Module 2"
+      status: "soon"
     },
     {
       to: "/funding",

@@ -121,6 +121,8 @@ def _build_maturity_out(tech: Technology) -> MaturityOut:
         ),
         methodology_version=m.methodology_version,
         calculated_at=m.calculated_at,
+        factor_weight=0.15,
+        weighted_contribution=round((m.score or 0.0) * 0.15, 2),
     )
 
 
@@ -441,7 +443,18 @@ def get_technology_maturity(tech_id: str, db: Session = Depends(get_db)):
 
     Used by Module 7 (Innovation Score) as the Technology Maturity factor.
     """
-    tech = _get_tech_or_404(db, tech_id)
+    tech = db.query(Technology).filter(Technology.technology_id == tech_id).first()
+    if not tech:
+        from app.services.technology_maturity_service import get_technology_maturity as get_member4_maturity
+        m4 = get_member4_maturity(tech_id)
+        return MaturityOut(
+            technology_id=m4.technology_id,
+            stage=m4.stage,
+            score=m4.score,
+            factor_weight=m4.factor_weight,
+            weighted_contribution=m4.weighted_contribution,
+            confidence=m4.confidence,
+        )
     return _build_maturity_out(tech)
 
 

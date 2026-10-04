@@ -78,6 +78,64 @@ export default function MiniLineChart({
   // Y axis ticks (3 ticks)
   const yTicks = [0, Math.round(maxVal / 2), maxVal];
 
+  // Pre-compute tooltip content BEFORE return — avoids IIFE (() => {...})() in JSX
+  // which causes "Unexpected token" parse errors in Vite/Babel.
+  let tooltipContent = null;
+  if (hoveredIndex !== null && sorted[hoveredIndex]) {
+    const curr = sorted[hoveredIndex];
+    const prev = hoveredIndex > 0 ? sorted[hoveredIndex - 1] : null;
+    const rYoY = prev && prev.research_papers && curr.research_papers
+      ? Math.round(((curr.research_papers - prev.research_papers) / prev.research_papers) * 100)
+      : null;
+    const pYoY = prev && prev.patents && curr.patents
+      ? Math.round(((curr.patents - prev.patents) / prev.patents) * 100)
+      : null;
+
+    tooltipContent = (
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--clr-bg-elevated)',
+          border: '1px solid var(--clr-border)',
+          borderRadius: 'var(--radius-sm)',
+          padding: '6px 12px',
+          fontSize: '0.8rem',
+          display: 'flex',
+          gap: '12px',
+          alignItems: 'center',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+          pointerEvents: 'none',
+          zIndex: 10,
+        }}
+      >
+        <span><strong>{curr.year}</strong></span>
+        {showResearch && (
+          <span style={{ color: '#38bdf8', fontWeight: 500 }}>
+            Papers: {curr.research_papers?.toLocaleString() || 0}
+            {rYoY !== null && (
+              <span style={{ marginLeft: 4, fontSize: '0.72rem', color: rYoY >= 0 ? '#34d399' : '#f87171' }}>
+                ({rYoY >= 0 ? `+${rYoY}` : rYoY}% YoY)
+              </span>
+            )}
+          </span>
+        )}
+        {showPatents && (
+          <span style={{ color: '#a855f7', fontWeight: 500 }}>
+            Patents: {curr.patents?.toLocaleString() || 0}
+            {pYoY !== null && (
+              <span style={{ marginLeft: 4, fontSize: '0.72rem', color: pYoY >= 0 ? '#34d399' : '#f87171' }}>
+                ({pYoY >= 0 ? `+${pYoY}` : pYoY}% YoY)
+              </span>
+            )}
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="chart-container">
       <svg
@@ -180,7 +238,7 @@ export default function MiniLineChart({
           </>
         )}
 
-        {/* Hover vertical line and tooltip */}
+        {/* Hover vertical line */}
         {hoveredIndex !== null && (
           <line
             x1={getX(hoveredIndex)}
@@ -218,61 +276,8 @@ export default function MiniLineChart({
         )}
       </div>
 
-      {/* Tooltip display with real-time YoY growth percentage */}
-      {hoveredIndex !== null && sorted[hoveredIndex] && (() => {
-        const curr = sorted[hoveredIndex];
-        const prev = hoveredIndex > 0 ? sorted[hoveredIndex - 1] : null;
-        const rYoY = prev && prev.research_papers && curr.research_papers
-          ? Math.round(((curr.research_papers - prev.research_papers) / prev.research_papers) * 100)
-          : null;
-        const pYoY = prev && prev.patents && curr.patents
-          ? Math.round(((curr.patents - prev.patents) / prev.patents) * 100)
-          : null;
-
-        return (
-          <div
-            style={{
-              position: 'absolute',
-              top: 10,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'var(--clr-bg-elevated)',
-              border: '1px solid var(--clr-border)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '6px 12px',
-              fontSize: '0.8rem',
-              display: 'flex',
-              gap: '12px',
-              alignItems: 'center',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-              pointerEvents: 'none',
-              zIndex: 10,
-            }}
-          >
-            <span><strong>{curr.year}</strong></span>
-            {showResearch && (
-              <span style={{ color: '#38bdf8', fontWeight: 500 }}>
-                Papers: {curr.research_papers?.toLocaleString() || 0}
-                {rYoY !== null && (
-                  <span style={{ marginLeft: 4, fontSize: '0.72rem', color: rYoY >= 0 ? '#34d399' : '#f87171' }}>
-                    ({rYoY >= 0 ? `+${rYoY}` : rYoY}% YoY)
-                  </span>
-                )}
-              </span>
-            )}
-            {showPatents && (
-              <span style={{ color: '#a855f7', fontWeight: 500 }}>
-                Patents: {curr.patents?.toLocaleString() || 0}
-                {pYoY !== null && (
-                  <span style={{ marginLeft: 4, fontSize: '0.72rem', color: pYoY >= 0 ? '#34d399' : '#f87171' }}>
-                    ({pYoY >= 0 ? `+${pYoY}` : pYoY}% YoY)
-                  </span>
-                )}
-              </span>
-            )}
-          </div>
-        );
-      })()}
+      {/* Tooltip (pre-computed before return to avoid IIFE parse error) */}
+      {tooltipContent}
     </div>
   );
 }

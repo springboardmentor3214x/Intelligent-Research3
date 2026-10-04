@@ -78,13 +78,15 @@ class MaturityOut(BaseModel):
     technology_id: str
     stage: str
     score: float | None = None
-    indicators: MaturityIndicators
+    indicators: MaturityIndicators | None = None
     weights: MaturityWeights = MaturityWeights()
     adoption: AdoptionOut | None = None
     confidence: float | None = None
     explanation: ExplanationOut | None = None
     methodology_version: str = "maturity_v1"
     calculated_at: datetime | None = None
+    factor_weight: float = 0.15
+    weighted_contribution: float | None = None
 
 
 # ─── Technology ──────────────────────────────────────────────────────────────

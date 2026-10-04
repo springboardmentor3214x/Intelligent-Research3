@@ -17,9 +17,20 @@ try:
 except Exception:
     pass
 
+try:
+    from app.models.innovation_score import InnovationScore
+except Exception:
+    pass
+
+try:
+    from app.models.commercialization import CommercializationRecommendation
+except Exception:
+    pass
+
 __all__ = [
     "User", "RoleEnum", "ResearchProfile", "ResearchTag", "Publication", "Patent",
     "FundingOpportunity",
     "Technology", "TechnologyMetric", "TechnologyTrend",
     "TechnologyMaturity", "TechnologyOpportunity", "TechnologyCompetitor", "DataSourceLog",
+    "InnovationScore", "CommercializationRecommendation",
 ]

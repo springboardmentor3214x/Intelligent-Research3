@@ -1,0 +1,170 @@
+export const modules = [
+  {
+    id: "01",
+    title: "User & Profile Management",
+    description: "Secure identity, profile and organization management for every platform user.",
+    icon: "Users",
+    color: "#1769C2",
+    features: ["User Management", "Role Management", "Profile Management", "Research Interests", "Organization Information"],
+  },
+  {
+    id: "02",
+    title: "Funding Discovery Module",
+    description: "Discover relevant funding opportunities and match them with user eligibility and research interests.",
+    icon: "Search",
+    color: "#15835B",
+    features: ["Opportunity Collection", "Grant Matching", "Eligibility Check", "Recommendations", "Funding Alerts"],
+  },
+  {
+    id: "03",
+    title: "Research Trend Intelligence",
+    description: "Analyze research publications and identify emerging topics, trends and research hotspots.",
+    icon: "TrendingUp",
+    color: "#7354C7",
+    features: ["Publication Analysis", "Trend Detection", "Topic Modeling", "Citation Analytics", "Research Hotspots"],
+  },
+  {
+    id: "04",
+    title: "Patent Landscape Analysis",
+    description: "Analyze patent activity, technology clusters and competitive innovation landscapes.",
+    icon: "FileText",
+    color: "#D9822B",
+    features: ["Patent Search", "Patent Clustering", "Trend Analysis", "Competitor Analysis", "Innovation Mapping"],
+  },
+  {
+    id: "05",
+    title: "Technology Intelligence",
+    description: "Monitor emerging technologies, technology maturity and adoption opportunities.",
+    icon: "Lightbulb",
+    color: "#1769C2",
+    features: ["Emerging Technology Detection", "Technology Maturity Analysis", "Adoption Tracking", "Opportunity Discovery", "Technology Monitoring"],
+  },
+  {
+    id: "06",
+    title: "Innovation Scoring Engine",
+    description: "Evaluate innovation potential using multiple research, technology, market and funding signals.",
+    icon: "Award",
+    color: "#15835B",
+    features: ["Innovation Scoring", "Impact Scoring", "Technology Readiness Scoring", "Market Potential Scoring", "Funding Relevance"],
+  },
+  {
+    id: "07",
+    title: "Commercialization Recommendation",
+    description: "Convert research and technology intelligence into practical commercialization pathways.",
+    icon: "Rocket",
+    color: "#7354C7",
+    features: ["Commercialization Analysis", "Productization Ideas", "Licensing Opportunities", "Startup Recommendations", "Industry Partnerships"],
+  },
+  {
+    id: "08",
+    title: "Notification & Alert System",
+    description: "Deliver timely alerts about relevant changes across funding, patents, research and opportunities.",
+    icon: "Bell",
+    color: "#D9822B",
+    features: ["Funding Alerts", "Patent Alerts", "Trend Updates", "Opportunity Alerts", "System Notifications"],
+  },
+  {
+    id: "09",
+    title: "Dashboard & Analytics",
+    description: "Provide role-specific dashboards and interactive analytics for different platform users.",
+    icon: "PieChart",
+    color: "#1769C2",
+    features: ["Researcher Dashboard", "Startup Dashboard", "Innovation Manager Dashboard", "Admin Dashboard", "Advanced Analytics"],
+  },
+  {
+    id: "10",
+    title: "Reports & Export System",
+    description: "Generate structured intelligence reports and export insights for further analysis.",
+    icon: "FileDown",
+    color: "#15835B",
+    features: ["Funding Reports", "Patent Reports", "Trend Reports", "Innovation Reports", "PDF / Excel Export"],
+  },
+  {
+    id: "11",
+    title: "Security & Compliance",
+    description: "Protect platform data and enforce enterprise-grade security, access and compliance controls.",
+    icon: "Shield",
+    color: "#7354C7",
+    features: ["Data Security", "Access Control", "Audit Logs", "Compliance", "Data Privacy"],
+  },
+  {
+    id: "12",
+    title: "System Management",
+    description: "Manage platform configuration, APIs, background jobs, data and operational monitoring.",
+    icon: "Settings",
+    color: "#D9822B",
+    features: ["System Configuration", "Data Management", "API Management", "Background Jobs", "Monitoring"],
+  },
+];
+
+export const userTypes = [
+  {
+    role: "Researcher",
+    icon: "BookOpen",
+    color: "#1769C2",
+    description: "Discover funding opportunities matched to your research interests, track publication trends, monitor patent activity in your field, and generate research intelligence reports.",
+  },
+  {
+    role: "Startup Founder",
+    icon: "Rocket",
+    color: "#15835B",
+    description: "Identify commercialization pathways, discover relevant grants and venture funding, analyze technology landscapes, and get innovation scoring for your product.",
+  },
+  {
+    role: "Innovation Manager",
+    icon: "Lightbulb",
+    color: "#7354C7",
+    description: "Monitor organization-wide research and technology trends, manage team innovation pipelines, generate cross-functional reports, and track emerging opportunities.",
+  },
+  {
+    role: "University",
+    icon: "Building2",
+    color: "#D9822B",
+    description: "Centralize research intelligence across departments, track faculty publications and patents, identify funding sources, and benchmark innovation performance.",
+  },
+  {
+    role: "Enterprise",
+    icon: "Briefcase",
+    color: "#123B72",
+    description: "Monitor competitive technology landscapes, identify strategic R&D investment opportunities, track industry patent activity, and measure innovation ROI.",
+  },
+  {
+    role: "Investor",
+    icon: "TrendingUp",
+    color: "#15835B",
+    description: "Evaluate startup innovation scores, analyze technology maturity levels, monitor emerging market trends, and assess research commercialization potential.",
+  },
+  {
+    role: "Administrator",
+    icon: "Settings",
+    color: "#66758A",
+    description: "Manage platform users and roles, configure data sources and integrations, monitor system health, ensure security compliance, and generate operational reports.",
+  },
+];
+
+export const dataSources = [
+  { name: "OpenAlex", description: "Open scholarly works, authors, venues, institutions", category: "Research" },
+  { name: "Semantic Scholar", description: "AI-powered research corpus with citation graph", category: "Research" },
+  { name: "Crossref", description: "DOI registration and scholarly metadata", category: "Research" },
+  { name: "Google Patents", description: "Global patent search and analysis", category: "Patents" },
+  { name: "USPTO", description: "US Patent and Trademark Office database", category: "Patents" },
+  { name: "The Lens", description: "Open patent and scholarly analytics", category: "Patents" },
+  { name: "Funding Databases", description: "Grants.gov, NIH, NSF and global funding bodies", category: "Funding" },
+  { name: "Govt. Funding Portals", description: "National and regional innovation funding portals", category: "Funding" },
+  { name: "News & Web Sources", description: "Technology news, press releases, company intelligence", category: "Intelligence" },
+];
+
+export const workflowSteps = [
+  { step: "01", title: "Create Profile", description: "User creates account and defines role, organization and research interests.", icon: "UserPlus" },
+  { step: "02", title: "Discover Data", description: "The platform collects relevant research, funding, patent and technology information.", icon: "Search" },
+  { step: "03", title: "AI Analysis", description: "AI/NLP and analytics services process the collected information.", icon: "Brain" },
+  { step: "04", title: "Generate Intelligence", description: "The system identifies trends, opportunities, risks and recommendations.", icon: "BarChart3" },
+  { step: "05", title: "Make Informed Decisions", description: "Users access dashboards, alerts, reports and recommendations.", icon: "CheckCircle2" },
+];
+
+export const stats = [
+  { value: "12", label: "Intelligence Modules" },
+  { value: "7+", label: "User & Organization Roles" },
+  { value: "AI", label: "Analytics & Recommendation Layer" },
+  { value: "Multi-source", label: "Research & Innovation Data" },
+];

@@ -1,0 +1,539 @@
+/* ==========================================================================
+   MODULE 10: NOTIFICATION & ALERT INTELLIGENCE STYLES
+   Professional enterprise UI with subtle micro-animations
+   ========================================================================== */
+
+/* ── 1. Bell & Badge ──────────────────────────────────────────────────────── */
+.ri-notif-bell-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #FFFFFF;
+  border: 1px solid var(--ri-border-subtle, #E2E8F0);
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ri-notif-bell-btn:hover {
+  background: #F8FAFC;
+  color: #1E293B;
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.ri-notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #EF4444;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  animation: riBadgePulse 2.5s infinite;
+}
+
+@keyframes riBadgePulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+/* ── 2. Slide-Over Notification Drawer ───────────────────────────────────── */
+.ri-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+  animation: riFadeIn 0.2s ease-out;
+}
+
+.ri-drawer-panel {
+  width: 480px;
+  max-width: 95vw;
+  height: 100%;
+  background: #FFFFFF;
+  box-shadow: -8px 0 28px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  animation: riSlideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes riSlideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes riFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ri-drawer-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FAFAFC;
+}
+
+.ri-drawer-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ri-drawer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
+}
+
+.ri-drawer-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #EFF6FF;
+  color: #2563EB;
+}
+
+.ri-drawer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ri-btn-subtle {
+  background: none;
+  border: 1px solid transparent;
+  color: #64748B;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ri-btn-subtle:hover {
+  background: #F1F5F9;
+  color: #1E293B;
+}
+
+/* Category Filter Tabs inside Drawer */
+.ri-drawer-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 18px;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F1F5F9;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ri-drawer-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.ri-drawer-tab {
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #64748B;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.ri-drawer-tab:hover {
+  border-color: #CBD5E1;
+  color: #334155;
+}
+
+.ri-drawer-tab.active {
+  background: #1E293B;
+  color: #FFFFFF;
+  border-color: #1E293B;
+}
+
+.ri-drawer-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ri-drawer-footer {
+  padding: 12px 18px;
+  border-top: 1px solid #E2E8F0;
+  background: #FAFAFC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── 3. Notification Card ─────────────────────────────────────────────────── */
+.ri-notif-card {
+  position: relative;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-left: 4px solid #94A3B8;
+  display: flex;
+  gap: 12px;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.ri-notif-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.ri-notif-card.unread {
+  background: #F8FAFF;
+  border-color: #BFDBFE;
+}
+
+.ri-notif-card.priority-CRITICAL {
+  border-left-color: #EF4444;
+}
+
+.ri-notif-card.priority-HIGH {
+  border-left-color: #F59E0B;
+}
+
+.ri-notif-card.priority-MEDIUM {
+  border-left-color: #3B82F6;
+}
+
+.ri-notif-card.priority-LOW {
+  border-left-color: #10B981;
+}
+
+.ri-notif-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ri-notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ri-notif-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.ri-notif-category-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ri-notif-time {
+  font-size: 11.5px;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ri-notif-unread-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2563EB;
+}
+
+.ri-notif-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 4px 0;
+  line-height: 1.4;
+}
+
+.ri-notif-msg {
+  font-size: 12.5px;
+  color: #475569;
+  margin: 0 0 6px 0;
+  line-height: 1.5;
+}
+
+.ri-notif-relevance-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #0369A1;
+  background: #F0F9FF;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #BAE6FD;
+  margin-top: 4px;
+}
+
+.ri-notif-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ri-notif-btn-action {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ri-notif-btn-action:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.ri-notif-btn-primary {
+  background: #2563EB;
+  color: #FFFFFF;
+  border-color: #2563EB;
+}
+
+.ri-notif-btn-primary:hover {
+  background: #1D4ED8;
+  color: #FFFFFF;
+}
+
+/* ── 4. Toast Notifications ───────────────────────────────────────────────── */
+.ri-toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.ri-toast-item {
+  pointer-events: auto;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-left: 5px solid #3B82F6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  animation: riToastSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes riToastSlideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ri-toast-item.priority-CRITICAL {
+  border-left-color: #EF4444;
+}
+
+.ri-toast-item.priority-HIGH {
+  border-left-color: #F59E0B;
+}
+
+.ri-toast-item.priority-MEDIUM {
+  border-left-color: #3B82F6;
+}
+
+.ri-toast-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0 0 3px 0;
+}
+
+.ri-toast-msg {
+  font-size: 12px;
+  color: #475569;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ri-toast-close {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: auto;
+  transition: color 0.15s ease;
+}
+
+.ri-toast-close:hover {
+  color: #334155;
+}
+
+/* ── 5. Full Alerts Page Styles ───────────────────────────────────────────── */
+.ri-alerts-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.ri-tab-nav {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #E2E8F0;
+  margin-bottom: 24px;
+}
+
+.ri-tab-btn {
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748B;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.ri-tab-btn:hover {
+  color: #1E293B;
+}
+
+.ri-tab-btn.active {
+  color: #2563EB;
+  border-bottom-color: #2563EB;
+}
+
+.ri-filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.ri-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 260px;
+  flex: 1;
+}
+
+.ri-search-input {
+  border: none;
+  outline: none;
+  font-size: 13px;
+  width: 100%;
+  color: #0F172A;
+}
+
+/* Modal Overlay */
+.ri-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: riFadeIn 0.2s ease-out;
+}
+
+.ri-modal-dialog {
+  background: #FFFFFF;
+  border-radius: 12px;
+  width: 650px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  animation: riModalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes riModalPop {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

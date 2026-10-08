@@ -1,0 +1,164 @@
+/* ==========================================================================
+   MODULE 4: FUNDING INTELLIGENCE DASHBOARD STYLES
+   Enterprise SaaS Light Theme Design System
+   ========================================================================== */
+
+/* Eligibility Badges */
+.ri-badge-success {
+  background-color: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ri-badge-warning {
+  background-color: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ri-badge-neutral {
+  background-color: #F1F5F9;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Funding Card */
+.ri-funding-card {
+  background: #ffffff;
+  border: 1px solid var(--ri-border-subtle);
+  border-radius: var(--ri-radius-md);
+  padding: 20px;
+  box-shadow: var(--ri-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.2s ease;
+  border-top: 4px solid var(--ri-blue-accent);
+}
+
+.ri-funding-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ri-shadow-md);
+  border-color: var(--ri-border-medium);
+}
+
+.ri-funding-amount-tag {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #047857;
+  margin-bottom: 4px;
+}
+
+.ri-match-reason-box {
+  background-color: #F0F9FF;
+  border: 1px solid #BAE6FD;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 12px 0;
+  font-size: 12.5px;
+}
+
+.ri-match-reason-title {
+  font-weight: 700;
+  color: #0369A1;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ri-match-tag {
+  display: inline-block;
+  background: #ffffff;
+  color: #0284C7;
+  border: 1px solid #93C5FD;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-top: 2px;
+}
+
+/* Funding Comparison Table */
+.ri-comparison-table-wrap {
+  background: #ffffff;
+  border: 1px solid var(--ri-border-subtle);
+  border-radius: var(--ri-radius-md);
+  overflow-x: auto;
+  box-shadow: var(--ri-shadow-sm);
+}
+
+.ri-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.ri-comparison-table th {
+  background-color: #FAFCFE;
+  padding: 14px 18px;
+  border-bottom: 2px solid var(--ri-border-subtle);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ri-navy-primary);
+}
+
+.ri-comparison-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--ri-border-subtle);
+  color: var(--ri-text-secondary);
+  vertical-align: top;
+}
+
+.ri-comparison-row-label {
+  font-weight: 700;
+  color: var(--ri-navy-primary);
+  background-color: #F8FAFC;
+  width: 180px;
+}
+
+/* Deadline Tracker Badges */
+.ri-deadline-badge-urgent {
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FCA5A5;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.ri-deadline-badge-upcoming {
+  background-color: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #93C5FD;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}

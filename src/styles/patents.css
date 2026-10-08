@@ -1,0 +1,108 @@
+/* ==========================================================================
+   MODULE 5: PATENT LANDSCAPE ANALYSIS & INTELLIGENCE STYLES
+   Enterprise SaaS Light Theme Design System
+   ========================================================================== */
+
+/* Patent Card */
+.ri-patent-card {
+  background: #ffffff;
+  border: 1px solid var(--ri-border-subtle);
+  border-radius: var(--ri-radius-md);
+  padding: 20px;
+  box-shadow: var(--ri-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all 0.2s ease;
+  border-left: 4px solid var(--ri-purple);
+}
+
+.ri-patent-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ri-shadow-md);
+  border-color: var(--ri-border-medium);
+}
+
+.ri-patent-num-tag {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ri-purple);
+  background-color: var(--ri-purple-bg);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* Cluster Visual Card */
+.ri-cluster-card {
+  background: #ffffff;
+  border: 1px solid var(--ri-border-subtle);
+  border-radius: var(--ri-radius-md);
+  padding: 22px;
+  box-shadow: var(--ri-shadow-sm);
+  margin-bottom: 20px;
+}
+
+.ri-cluster-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--ri-border-subtle);
+  padding-bottom: 10px;
+}
+
+.ri-cluster-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ri-navy-primary);
+}
+
+/* Innovation Map Node Flow */
+.ri-map-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ri-map-node-row {
+  background: #ffffff;
+  border: 1px solid var(--ri-border-subtle);
+  border-radius: var(--ri-radius-md);
+  padding: 18px 24px;
+  box-shadow: var(--ri-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+}
+
+.ri-map-step-box {
+  flex: 1;
+  padding: 12px 14px;
+  background: #F8FAFC;
+  border-radius: 8px;
+  border: 1px solid var(--ri-border-subtle);
+}
+
+.ri-map-step-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ri-text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.ri-map-step-val {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ri-navy-primary);
+}
+
+.ri-map-arrow {
+  color: var(--ri-blue-accent);
+  flex-shrink: 0;
+}

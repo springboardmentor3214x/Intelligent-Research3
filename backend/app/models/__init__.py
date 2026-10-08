@@ -8,6 +8,14 @@ from app.models.research_profile import (
     Publication,
     Patent,
 )
+from app.models.notification import (
+    Notification,
+    NotificationPreference,
+    DeliveryLog,
+    EventTypeEnum,
+    PriorityEnum,
+    DeliveryChannelEnum,
+)
 
 __all__ = [
     "User",
@@ -19,4 +27,10 @@ __all__ = [
     "OrganizationInfo",
     "Publication",
     "Patent",
+    "Notification",
+    "NotificationPreference",
+    "DeliveryLog",
+    "EventTypeEnum",
+    "PriorityEnum",
+    "DeliveryChannelEnum",
 ]

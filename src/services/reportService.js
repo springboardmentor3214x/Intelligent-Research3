@@ -23,7 +23,8 @@ export const REPORT_TYPES = [
   { id: 'technology', label: 'Technology Intelligence Report', description: 'Technology maturity, adoption signals, and competitive landscape.', module: 'Module 6', color: '#0284C7', bg: '#E0F2FE', icon: 'Cpu', filters: ['technology', 'maturity', 'adoption', 'domain', 'date_range'], sections: ['Summary', 'Technology Analysis', 'Maturity Assessment', 'Adoption Signals'], estimatedTime: '< 30 seconds' },
   { id: 'innovation', label: 'Innovation Intelligence Report', description: 'Innovation scoring breakdown with full factor analysis and evidence.', module: 'Module 7', color: '#D97706', bg: '#FEF3C7', icon: 'Award', filters: ['research_area', 'technology', 'score_min', 'score_max', 'date_range'], sections: ['Summary', 'Innovation Scores', 'Factor Breakdown', 'Evidence'], estimatedTime: '< 30 seconds' },
   { id: 'commercialization', label: 'Commercialization Report', description: 'Commercialization pathway analysis across four strategic dimensions.', module: 'Module 8', color: '#0D9488', bg: '#CCFBF1', icon: 'Rocket', filters: ['technology', 'pathway', 'domain', 'date_range'], sections: ['Summary', 'Productization', 'Licensing', 'Startup Opportunities', 'Industry Partnerships'], estimatedTime: '< 30 seconds' },
-  { id: 'comprehensive', label: 'Comprehensive Intelligence Report', description: 'Executive-grade multi-module intelligence report combining all platform data.', module: 'Modules 3-8', color: '#123B72', bg: '#EFF6FF', icon: 'FileBarChart2', filters: ['domain', 'technology', 'keyword', 'date_range'], sections: ['Cover Page', 'Executive Summary', 'Research Intelligence', 'Funding Intelligence', 'Patent Landscape', 'Technology Intelligence', 'Innovation Assessment', 'Commercialization Opportunities', 'Key Insights', 'Risks & Limitations', 'Data Sources & Methodology'], estimatedTime: '30-90 seconds', isComprehensive: true },
+  { id: 'copilot', label: 'Research Copilot & Innovation Blueprint', description: 'AI-guided domain exploration, literature deep-dives, identified gaps, candidate ideas, and execution blueprints.', module: 'Copilot', color: '#8B5CF6', bg: '#FAF5FF', icon: 'FileBarChart2', filters: ['domain', 'topic', 'date_range'], sections: ['Summary', 'Research Discoveries', 'Candidate Ideas', 'Execution Blueprints', 'Milestones'], estimatedTime: '< 30 seconds' },
+  { id: 'comprehensive', label: 'Comprehensive Intelligence Report', description: 'Executive-grade multi-module intelligence report combining all platform data.', module: 'Modules 3-8 & Copilot', color: '#123B72', bg: '#EFF6FF', icon: 'FileBarChart2', filters: ['domain', 'technology', 'keyword', 'date_range'], sections: ['Cover Page', 'Executive Summary', 'Research Intelligence', 'Funding Intelligence', 'Patent Landscape', 'Technology Intelligence', 'Innovation Assessment', 'Commercialization Opportunities', 'Copilot Discoveries & Blueprints', 'Key Insights', 'Risks & Limitations', 'Data Sources & Methodology'], estimatedTime: '30-90 seconds', isComprehensive: true },
 ];
 
 export const REPORT_STATUSES = { QUEUED: 'queued', GENERATING: 'generating', COMPLETED: 'completed', FAILED: 'failed', EXPIRED: 'expired' };
@@ -63,9 +64,9 @@ export function canAccessReport(user, profile, reportRecord) {
 export function getAllowedReportTypes(profile) {
   const role = (profile?.role || '').toLowerCase();
   if (role.includes('admin')) return REPORT_TYPES;
-  if (role.includes('researcher')) return REPORT_TYPES.filter((t) => ['research', 'funding', 'patents', 'innovation', 'commercialization', 'comprehensive'].includes(t.id));
-  if (role.includes('startup') || role.includes('founder')) return REPORT_TYPES.filter((t) => ['funding', 'patents', 'technology', 'innovation', 'commercialization', 'comprehensive'].includes(t.id));
-  if (role.includes('manager')) return REPORT_TYPES.filter((t) => ['technology', 'innovation', 'funding', 'comprehensive', 'research', 'patents'].includes(t.id));
+  if (role.includes('researcher')) return REPORT_TYPES.filter((t) => ['research', 'funding', 'patents', 'innovation', 'commercialization', 'copilot', 'comprehensive'].includes(t.id));
+  if (role.includes('startup') || role.includes('founder')) return REPORT_TYPES.filter((t) => ['funding', 'patents', 'technology', 'innovation', 'commercialization', 'copilot', 'comprehensive'].includes(t.id));
+  if (role.includes('manager')) return REPORT_TYPES.filter((t) => ['technology', 'innovation', 'funding', 'copilot', 'comprehensive', 'research', 'patents'].includes(t.id));
   return REPORT_TYPES;
 }
 
@@ -210,7 +211,31 @@ async function aggregateCommercializationData(filters = {}) {
   } catch { return { status: 'error', error: 'Commercialization data could not be retrieved. Please try again.', source_module: 'Module 8 - Commercialization Recommendation' }; }
 }
 
-function buildKeyInsights(research, funding, patents, technology, innovation, commercialization) {
+async function aggregateCopilotData(filters = {}) {
+  try {
+    const res = await fetch('/api/copilot/sessions', {
+      headers: { 'x-user-id': 'demo-user-eval-01' }
+    });
+    const sessions = res.ok ? await res.json() : [];
+    const allIdeas = [];
+    const allPlans = [];
+    sessions.forEach((s) => {
+      (s.ideas || []).forEach((i) => allIdeas.push({ ...i, session_topic: s.topic }));
+      (s.plans || []).forEach((p) => allPlans.push({ ...p, session_topic: s.topic }));
+    });
+    return {
+      status: 'success', source_module: 'Innovation Feature: Discovery & Innovation Copilot',
+      sessions, ideas: allIdeas, plans: allPlans,
+      summary: { total_sessions: sessions.length, total_candidate_ideas: allIdeas.length, total_blueprints: allPlans.length, top_topics: sessions.map((s) => s.topic) },
+      data_sources: ['Research Discovery Copilot Engine', 'Groq Inference API (Llama/GPT-OSS)', 'Platform Unified Academic Repositories'],
+      generated_at: new Date().toISOString(),
+    };
+  } catch {
+    return { status: 'error', error: 'Copilot session data unavailable.', source_module: 'Innovation Feature: Discovery & Innovation Copilot' };
+  }
+}
+
+function buildKeyInsights(research, funding, patents, technology, innovation, commercialization, copilot) {
   const insights = [];
   if (research?.status === 'success' && research.summary?.total_papers > 0) insights.push({ module: 'Research', insight: `${research.summary.total_papers} relevant publications identified. Average citation count: ${research.summary.avg_citations}.` });
   if (funding?.status === 'success' && funding.summary?.total_opportunities > 0) insights.push({ module: 'Funding', insight: `${funding.summary.total_opportunities} funding opportunities identified across ${funding.summary.by_agency?.length || 0} agencies.` });
@@ -218,6 +243,7 @@ function buildKeyInsights(research, funding, patents, technology, innovation, co
   if (technology?.status === 'success' && technology.technologies?.length > 0) { const topTech = technology.summary?.top_by_growth?.[0]; if (topTech) insights.push({ module: 'Technology', insight: `Highest-growth technology: ${topTech.name} (+${topTech.growth_rate}% YoY, Stage: ${topTech.maturity}).` }); }
   if (innovation?.status === 'success' && innovation.summary?.top_scoring?.length > 0) { const top = innovation.summary.top_scoring[0]; insights.push({ module: 'Innovation', insight: `Highest-scoring innovation: "${top.title}" with a score of ${top.score}/100 (Official Module 7 calculation).` }); }
   if (commercialization?.status === 'success') insights.push({ module: 'Commercialization', insight: `${commercialization.summary?.total_pathways || 0} commercialization pathways identified with ${commercialization.summary?.total_recommendations || 0} strategic recommendations.` });
+  if (copilot?.status === 'success' && copilot.summary?.total_blueprints > 0) insights.push({ module: 'Copilot', insight: `${copilot.summary.total_blueprints} structured research project blueprints formulated with ${copilot.summary.total_candidate_ideas} evaluated candidate ideas.` });
   return insights;
 }
 
@@ -225,19 +251,20 @@ async function aggregateComprehensiveData(filters = {}) {
   const results = await Promise.allSettled([
     aggregateResearchData(filters), aggregateFundingData(filters), aggregatePatentData(filters),
     aggregateTechnologyData(filters), aggregateInnovationData(filters), aggregateCommercializationData(filters),
+    aggregateCopilotData(filters),
   ]);
-  const [research, funding, patents, technology, innovation, commercialization] = results.map((r) => r.status === 'fulfilled' ? r.value : { status: 'error', error: 'Section data unavailable.' });
-  const sectionStatuses = { research: research.status, funding: funding.status, patents: patents.status, technology: technology.status, innovation: innovation.status, commercialization: commercialization.status };
+  const [research, funding, patents, technology, innovation, commercialization, copilot] = results.map((r) => r.status === 'fulfilled' ? r.value : { status: 'error', error: 'Section data unavailable.' });
+  const sectionStatuses = { research: research.status, funding: funding.status, patents: patents.status, technology: technology.status, innovation: innovation.status, commercialization: commercialization.status, copilot: copilot.status };
   const failedSections = Object.entries(sectionStatuses).filter(([, s]) => s === 'error').map(([name]) => name);
   const completedSections = Object.entries(sectionStatuses).filter(([, s]) => s === 'success').map(([name]) => name);
   return {
-    status: failedSections.length === 6 ? 'error' : 'success', report_type: 'comprehensive',
+    status: failedSections.length === 7 ? 'error' : 'success', report_type: 'comprehensive',
     section_statuses: sectionStatuses, failed_sections: failedSections, completed_sections: completedSections,
-    executive_summary: { report_coverage: `${completedSections.length} of 6 intelligence modules`, failed_sections: failedSections, total_research_papers: research.summary?.total_papers ?? null, total_funding_opportunities: funding.summary?.total_opportunities ?? null, total_patents: patents.summary?.total_patents ?? null, total_technologies: technology.summary?.total_technologies ?? null, total_innovation_assessments: innovation.summary?.total_assessments ?? null, avg_innovation_score: innovation.summary?.average_score ?? null, commercialization_pathways: commercialization.summary?.total_pathways ?? null, top_innovation: innovation.summary?.top_scoring?.[0] ?? null, analysis_period: filters.dateRange ? `${filters.dateRange.start || 'All time'} to ${filters.dateRange.end || 'Present'}` : 'All Available Data' },
-    research, funding, patents, technology, innovation, commercialization,
-    key_insights: buildKeyInsights(research, funding, patents, technology, innovation, commercialization),
-    risks_and_limitations: ['Report data reflects information available at time of generation.', 'Innovation scores use official Module 7 weighted formula; values match the Innovation Dashboard.', 'Funding opportunities are from Grants.gov; verify deadlines on official agency websites.', 'Patent data is indicative; professional IP counsel required for legal patent searches.', 'Commercialization pathways are analytical assessments - not guaranteed business outcomes.', ...(failedSections.length > 0 ? [`Note: The following sections encountered data retrieval issues: ${failedSections.join(', ')}.`] : [])],
-    data_sources: ['OpenAlex Research Index', 'Semantic Scholar', 'Grants.gov', 'EPO Open Patent Services', 'USPTO Patent Database', 'Module 6 Technology Intelligence Index', 'Module 7 Innovation Scoring Engine', 'Module 8 Commercialization Engine'],
+    executive_summary: { report_coverage: `${completedSections.length} of 7 intelligence modules`, failed_sections: failedSections, total_research_papers: research.summary?.total_papers ?? null, total_funding_opportunities: funding.summary?.total_opportunities ?? null, total_patents: patents.summary?.total_patents ?? null, total_technologies: technology.summary?.total_technologies ?? null, total_innovation_assessments: innovation.summary?.total_assessments ?? null, avg_innovation_score: innovation.summary?.average_score ?? null, commercialization_pathways: commercialization.summary?.total_pathways ?? null, total_copilot_blueprints: copilot.summary?.total_blueprints ?? 0, analysis_period: filters.dateRange ? `${filters.dateRange.start || 'All time'} to ${filters.dateRange.end || 'Present'}` : 'All Available Data' },
+    research, funding, patents, technology, innovation, commercialization, copilot,
+    key_insights: buildKeyInsights(research, funding, patents, technology, innovation, commercialization, copilot),
+    risks_and_limitations: ['Report data reflects information available at time of generation.', 'Innovation scores use official Module 7 weighted formula; values match the Innovation Dashboard.', 'Funding opportunities are from Grants.gov; verify deadlines on official agency websites.', 'Patent data is indicative; professional IP counsel required for legal patent searches.', 'Commercialization pathways are analytical assessments - not guaranteed business outcomes.', 'Copilot research blueprints are advisory starting points and require empirical peer review.', ...(failedSections.length > 0 ? [`Note: The following sections encountered data retrieval issues: ${failedSections.join(', ')}.`] : [])],
+    data_sources: ['OpenAlex Research Index', 'Semantic Scholar', 'Grants.gov', 'EPO Open Patent Services', 'USPTO Patent Database', 'Module 6 Technology Intelligence Index', 'Module 7 Innovation Scoring Engine', 'Module 8 Commercialization Engine', 'Research Discovery & Innovation Copilot'],
     generated_at: new Date().toISOString(),
   };
 }
@@ -252,6 +279,7 @@ export async function generateReportPreview(reportType, filters = {}, config = {
     case 'technology': data = await aggregateTechnologyData(filters); break;
     case 'innovation': data = await aggregateInnovationData(filters); break;
     case 'commercialization': data = await aggregateCommercializationData(filters); break;
+    case 'copilot': data = await aggregateCopilotData(filters); break;
     case 'comprehensive': data = await aggregateComprehensiveData(filters); break;
     default: return { status: 'error', error: `Unknown report type: ${reportType}` };
   }
@@ -395,12 +423,26 @@ export function generateExcelData(report) {
         if (data.recommendations) sheets['Recommendations'] = [['Recommendation', 'Evidence', 'Confidence', 'Next Action', 'Source Modules'], ...data.recommendations.map((r) => [r.recommendation, r.evidence, r.confidence, r.next_action, (r.source_modules || []).join('; ')])];
       }
       break;
+    case 'copilot':
+      if (data.sessions) {
+        sheets['Research Sessions'] = [['Topic', 'Domain', 'Knowledge Level', 'Current Stage', 'Created At'], ...data.sessions.map((s) => [s.topic, s.domain, s.user_level, `Stage ${s.current_stage}`, s.created_at])];
+      }
+      if (data.ideas && data.ideas.length > 0) {
+        sheets['Candidate Ideas'] = [['Title', 'Topic', 'Problem Statement', 'Proposed Solution', 'Relevance Score', 'Feasibility Score', 'Novelty Evidence', 'Selected'], ...data.ideas.map((i) => [i.title, i.session_topic, i.problem, i.solution, i.relevance_score, i.feasibility_score, i.novelty_evidence, i.is_selected ? 'Yes' : 'No'])];
+      }
+      if (data.plans && data.plans.length > 0) {
+        sheets['Research Blueprints'] = [['Title', 'Topic', 'Objectives', 'Methodology', 'Datasets', 'Metrics'], ...data.plans.map((p) => [p.title, p.session_topic, (p.objectives || []).join('; '), p.methodology, (p.datasets || []).map((d) => d.name || d).join('; '), (p.evaluation_metrics || []).join('; ')])];
+      }
+      break;
     case 'comprehensive':
       if (data.research?.status === 'success') sheets['Research'] = [['Title', 'Authors', 'Year', 'Journal', 'Citations', 'Source'], ...(data.research.papers || []).map((p) => [p.title, (p.authors || []).join('; '), p.year, p.journal, p.citations_count, p.source])];
       if (data.funding?.status === 'success') sheets['Funding'] = [['Title', 'Agency', 'Amount', 'Deadline', 'Country'], ...(data.funding.opportunities || []).map((o) => [o.title, o.agency, o.funding_amount, o.close_date, o.country])];
       if (data.patents?.status === 'success') sheets['Patents'] = [['Title', 'Assignee', 'Status', 'Domain', 'Citations'], ...(data.patents.patents || []).map((p) => [p.title, p.assignee, p.status, p.technology_domain, p.citations])];
       if (data.technology?.status === 'success') sheets['Technology'] = [['Name', 'Maturity', 'Growth Rate', 'Domain'], ...(data.technology.technologies || []).map((t) => [t.name, t.maturity_level, t.growth_rate, t.domain])];
       if (data.innovation?.status === 'success') sheets['Innovation'] = [['Title', 'Score', 'Domain', 'Status'], ...(data.innovation.assessments || []).map((a) => [a.title, a.overall_score ?? a.innovation_score, a.domain, a.status])];
+      if (data.copilot?.status === 'success' && data.copilot.plans?.length > 0) {
+        sheets['Copilot Blueprints'] = [['Title', 'Topic', 'Objectives', 'Datasets', 'Target Funding'], ...data.copilot.plans.map((p) => [p.title, p.session_topic, (p.objectives || []).join('; '), (p.datasets || []).map((d) => d.name || d).join('; '), (p.funding_alignment || []).map((f) => f.agency).join('; ')])];
+      }
       if (data.key_insights) sheets['Key Insights'] = [['Module', 'Insight'], ...(data.key_insights || []).map((i) => [i.module, i.insight])];
       break;
   }

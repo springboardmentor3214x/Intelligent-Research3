@@ -98,9 +98,12 @@ export default function ResearchSearch({
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
               >
-                <option value="all">All Sources (OpenAlex + Semantic Scholar)</option>
-                <option value="OpenAlex">OpenAlex Only</option>
-                <option value="Semantic Scholar">Semantic Scholar Only</option>
+                <option value="all">All Sources (5 Providers)</option>
+                <option value="OpenAlex">OpenAlex</option>
+                <option value="Semantic Scholar">Semantic Scholar</option>
+                <option value="Crossref">Crossref</option>
+                <option value="CORE">CORE (Open Access)</option>
+                <option value="Google Scholar">Google Scholar</option>
               </select>
             </div>
 

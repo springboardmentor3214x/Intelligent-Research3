@@ -6,7 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine, Base
+from app.db.base import Base as CoreBase
+import app.models  # Register all models with metadata
 from app.routers import notifications
+from app.routers import research
+from app.routers import copilot
 
 # Optional import of earlier routers if available
 try:
@@ -34,7 +38,8 @@ try:
 except ImportError:
     patents_router = None
 
-# Automatically create tables
+# Automatically create tables for both Core models and Notification models
+CoreBase.metadata.create_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -64,6 +69,8 @@ if patents_router:
     app.include_router(patents_router)
 
 app.include_router(notifications.router)
+app.include_router(research.router)
+app.include_router(copilot.router)
 
 @app.get("/")
 def read_root():

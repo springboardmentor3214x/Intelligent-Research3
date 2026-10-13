@@ -145,6 +145,19 @@ export const MODULE_REGISTRY = [
     bg: '#EEF2FF',
     badge: 'PDF / Excel',
   },
+  {
+    num: '10',
+    id: 'copilot',
+    label: 'Research Discovery & Innovation Copilot',
+    shortLabel: 'Innovation Copilot',
+    icon: Sparkles,
+    path: '/copilot',
+    color: '#7C3AED',
+    glow: 'rgba(124, 58, 237, 0.45)',
+    border: '#C4B5FD',
+    bg: '#FAF5FF',
+    badge: 'AI Companion',
+  },
 ];
 
 export default function EnterpriseLayout({

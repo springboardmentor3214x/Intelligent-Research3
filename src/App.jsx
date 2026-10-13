@@ -8,6 +8,7 @@ import PatentDashboard from './pages/patents/PatentDashboard';
 import TechnologyDashboard from './pages/technology/TechnologyDashboard';
 import InnovationDashboard from './pages/innovation/InnovationDashboard';
 import CommercializationDashboard from './pages/commercialization/CommercializationDashboard';
+import CopilotPage from './pages/copilot/CopilotPage';
 import ReportsPage from './pages/ReportsPage';
 import AlertsPage from './pages/AlertsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -163,6 +164,24 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <CommercializationDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Innovation Feature: Research Discovery & Innovation Copilot */}
+          <Route
+            path="/copilot"
+            element={
+              <ProtectedRoute requireProfileComplete={false}>
+                <CopilotPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/copilot/*"
+            element={
+              <ProtectedRoute requireProfileComplete={false}>
+                <CopilotPage />
               </ProtectedRoute>
             }
           />

@@ -111,6 +111,50 @@ def get_notification_counts(
     unread = db.query(Notification).filter(Notification.user_id == user_id, Notification.is_read == False).count()
     return {"total": total, "unread": unread}
 
+@router.get("/notifications/analytics", response_model=NotificationAnalyticsResponse)
+def get_analytics(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id)
+):
+    total = db.query(Notification).filter(Notification.user_id == user_id).count()
+    unread = db.query(Notification).filter(Notification.user_id == user_id, Notification.is_read == False).count()
+    read = total - unread
+
+    # Category counts
+    by_category = {}
+    for cat in DEFAULT_CATEGORIES:
+        c_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.category == cat).count()
+        by_category[cat] = c_count
+
+    # Priority counts
+    by_priority = {}
+    for p in ["LOW", "MEDIUM", "HIGH", "CRITICAL"]:
+        p_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.priority == p).count()
+        by_priority[p] = p_count
+
+    # Severity counts
+    by_severity = {}
+    for s in ["info", "warning", "success", "error"]:
+        s_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.severity == s).count()
+        by_severity[s] = s_count
+
+    # Duplicate prevented count from audit logs
+    dup_count = db.query(NotificationAuditLog).filter(
+        NotificationAuditLog.user_id == user_id,
+        NotificationAuditLog.result == "SKIPPED_DUPLICATE"
+    ).count()
+
+    return {
+        "total_notifications": total,
+        "unread_count": unread,
+        "read_count": read,
+        "by_category": by_category,
+        "by_priority": by_priority,
+        "by_severity": by_severity,
+        "delivery_success_rate": 100.0 if total > 0 else 100.0,
+        "duplicate_prevented_count": dup_count
+    }
+
 @router.get("/notifications/{notification_id}", response_model=NotificationResponse)
 def get_notification_by_id(
     notification_id: str,
@@ -250,49 +294,6 @@ def update_preferences(
     db.commit()
     return {"status": "success", "updated": len(payload.preferences)}
 
-@router.get("/notifications/analytics", response_model=NotificationAnalyticsResponse)
-def get_analytics(
-    db: Session = Depends(get_db),
-    user_id: str = Depends(get_current_user_id)
-):
-    total = db.query(Notification).filter(Notification.user_id == user_id).count()
-    unread = db.query(Notification).filter(Notification.user_id == user_id, Notification.is_read == False).count()
-    read = total - unread
-
-    # Category counts
-    by_category = {}
-    for cat in DEFAULT_CATEGORIES:
-        c_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.category == cat).count()
-        by_category[cat] = c_count
-
-    # Priority counts
-    by_priority = {}
-    for p in ["LOW", "MEDIUM", "HIGH", "CRITICAL"]:
-        p_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.priority == p).count()
-        by_priority[p] = p_count
-
-    # Severity counts
-    by_severity = {}
-    for s in ["info", "warning", "success", "error"]:
-        s_count = db.query(Notification).filter(Notification.user_id == user_id, Notification.severity == s).count()
-        by_severity[s] = s_count
-
-    # Duplicate prevented count from audit logs
-    dup_count = db.query(NotificationAuditLog).filter(
-        NotificationAuditLog.user_id == user_id,
-        NotificationAuditLog.result == "SKIPPED_DUPLICATE"
-    ).count()
-
-    return {
-        "total_notifications": total,
-        "unread_count": unread,
-        "read_count": read,
-        "by_category": by_category,
-        "by_priority": by_priority,
-        "by_severity": by_severity,
-        "delivery_success_rate": 100.0 if total > 0 else 100.0,
-        "duplicate_prevented_count": dup_count
-    }
 
 @router.post("/events/publish")
 def publish_platform_event(

@@ -9,6 +9,12 @@ from app.schemas.user import UserOut, UserUpdate
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+@router.get("/", response_model=list[UserOut])
+def list_all_users(db: Session = Depends(get_db)):
+    """Retrieve all registered users from the database."""
+    return db.query(User).order_by(User.id.asc()).all()
+
+
 @router.get("/me", response_model=UserOut)
 def get_current_user_profile(current_user: User = Depends(get_current_user)):
     return current_user

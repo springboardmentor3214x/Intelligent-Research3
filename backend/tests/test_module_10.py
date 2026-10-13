@@ -12,8 +12,9 @@ Tests:
 import sys
 import os
 
-# Add project root to sys.path
+# Add project root and backend to sys.path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from backend.app.database import Base, engine, SessionLocal
 from backend.app.models.notification import Notification, NotificationEvent, NotificationPreference, NotificationAuditLog

@@ -11,10 +11,15 @@ from app.models.research_profile import (
 from app.models.notification import (
     Notification,
     NotificationPreference,
-    DeliveryLog,
-    EventTypeEnum,
-    PriorityEnum,
-    DeliveryChannelEnum,
+    NotificationEvent,
+    NotificationDelivery,
+    NotificationAuditLog,
+)
+from app.models.copilot import (
+    CopilotSession,
+    CopilotMessage,
+    CopilotIdea,
+    CopilotProjectPlan,
 )
 
 __all__ = [
@@ -29,8 +34,11 @@ __all__ = [
     "Patent",
     "Notification",
     "NotificationPreference",
-    "DeliveryLog",
-    "EventTypeEnum",
-    "PriorityEnum",
-    "DeliveryChannelEnum",
+    "NotificationEvent",
+    "NotificationDelivery",
+    "NotificationAuditLog",
+    "CopilotSession",
+    "CopilotMessage",
+    "CopilotIdea",
+    "CopilotProjectPlan",
 ]

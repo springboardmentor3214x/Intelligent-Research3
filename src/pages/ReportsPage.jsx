@@ -23,6 +23,7 @@ import {
   generateDefaultTitle, createReportJob, executeReport, regenerateReport, getReportById,
   generateExcelData, generatePDFStructure,
 } from '../services/reportService';
+import { exportReportToPDF, exportReportToExcel } from '../services/reportExportHelper';
 import '../styles/reports.css';
 
 // ─── Icon map ──────────────────────────────────────────────
@@ -49,10 +50,18 @@ function downloadTextFile(filename, content, mimeType = 'text/plain') {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
+  a.style.display = 'none';
   a.href = url;
+  a.setAttribute('download', filename);
   a.download = filename;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    try {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {}
+  }, 1000);
 }
 
 // ─── Helper: generate CSV from 2D array ───────────────────
@@ -61,24 +70,23 @@ function arraysToCSV(arr) {
 }
 
 // ─── COMPONENT: Report Type Card ──────────────────────────
-function ReportTypeCard({ type, onSelect }) {
+function ReportTypeCard({ type, onOpenSummary, onQuickExportPDF, onQuickExportExcel, onSelect }) {
   const Icon = ICON_MAP[type.icon] || FileBarChart2;
   return (
     <div
       className="rpt-type-card"
       style={{ color: type.color }}
-      onClick={() => onSelect(type)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && onSelect(type)}
       id={`report-type-${type.id}`}
+      onClick={() => (onOpenSummary ? onOpenSummary(type) : onSelect && onSelect(type))}
     >
-      <div className="rpt-type-icon" style={{ background: type.bg }}>
-        <Icon size={20} color={type.color} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="rpt-type-icon" style={{ background: type.bg }}>
+          <Icon size={20} color={type.color} />
+        </div>
+        <span className="rpt-type-module-badge" style={{ background: type.bg, color: type.color }}>
+          {type.module}
+        </span>
       </div>
-      <span className="rpt-type-module-badge" style={{ background: type.bg, color: type.color }}>
-        {type.module}
-      </span>
       <h3 className="rpt-type-title">{type.label}</h3>
       <p className="rpt-type-desc">{type.description}</p>
       <div className="rpt-type-meta">
@@ -90,6 +98,46 @@ function ReportTypeCard({ type, onSelect }) {
             <Layers size={11} />Executive
           </span>
         )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid #F1F5F9' }}>
+        <button
+          className="rpt-btn rpt-btn-primary rpt-btn-sm"
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 12, fontWeight: 700 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onOpenSummary) onOpenSummary(type);
+            else if (onSelect) onSelect(type);
+          }}
+          title="Open complete intelligence summary & preview"
+        >
+          <Eye size={13} />
+          <span>Open Summary</span>
+        </button>
+
+        <button
+          className="rpt-btn rpt-btn-secondary rpt-btn-sm"
+          style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onQuickExportPDF) onQuickExportPDF(type);
+          }}
+          title="Quick Download PDF"
+        >
+          <FileText size={13} color="#DC2626" />
+        </button>
+
+        <button
+          className="rpt-btn rpt-btn-secondary rpt-btn-sm"
+          style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onQuickExportExcel) onQuickExportExcel(type);
+          }}
+          title="Quick Download Excel (.xlsx)"
+        >
+          <FileSpreadsheet size={13} color="#059669" />
+        </button>
       </div>
     </div>
   );
@@ -588,6 +636,60 @@ function ReportPreviewModal({ report, onClose, onExportPDF, onExportExcel }) {
     );
   };
 
+  const renderCopilotSection = () => {
+    const src = data.report_type === 'comprehensive' ? data.copilot : data;
+    if (!src || src.status === 'error') return <div className="rpt-section-alert rpt-alert-error"><AlertCircle size={14} />Copilot data unavailable: {src?.error || 'Unknown error'}</div>;
+    const plans = src.plans || [];
+    const ideas = src.ideas || [];
+    return (
+      <div>
+        <div className="rpt-section-alert rpt-alert-info"><Info size={14} />AI-guided research discoveries, candidate ideas, and project blueprints formulated in the Research Discovery & Innovation Copilot with live literature verification.</div>
+        {plans.length > 0 && (
+          <div style={{ marginBottom: 16 }}>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 8 }}>Generated Project Blueprints</h4>
+            {plans.map((p, idx) => (
+              <div key={idx} className="rpt-pathway-card" style={{ borderLeft: '3px solid #8B5CF6' }}>
+                <div className="rpt-pathway-header">
+                  <div className="rpt-pathway-title" style={{ color: '#6D28D9' }}>{p.title}</div>
+                  <span className="rpt-pathway-potential" style={{ background: '#EDE9FE', color: '#7C3AED' }}>{p.session_topic || 'Discovery'}</span>
+                </div>
+                <div style={{ fontSize: 12, color: '#475569', marginTop: 6 }}>
+                  <strong>Key Methodology:</strong> {p.methodology}
+                </div>
+                {p.objectives?.length > 0 && (
+                  <ul style={{ fontSize: 12, color: '#64748B', marginTop: 6, paddingLeft: 16 }}>
+                    {p.objectives.slice(0, 3).map((obj, i) => <li key={i}>{obj}</li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {ideas.length > 0 && (
+          <div>
+            <h4 style={{ fontSize: 13, fontWeight: 700, color: '#1E293B', marginBottom: 8 }}>Evaluated Candidate Research Ideas</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
+              {ideas.slice(0, 6).map((idea, idx) => (
+                <div key={idx} style={{ padding: 12, background: '#FAF5FF', border: '1px solid #E9D5FF', borderRadius: 8 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: '#6B21A8' }}>{idea.title}</div>
+                  <div style={{ fontSize: 11.5, color: '#64748B', marginTop: 4 }}>{idea.problem?.slice(0, 100)}...</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 8, fontSize: 11, fontWeight: 600 }}>
+                    <span style={{ color: '#059669' }}>Rel: {idea.relevance_score || 85}%</span>
+                    <span style={{ color: '#2563EB' }}>Feas: {idea.feasibility_score || 80}%</span>
+                    {idea.is_selected && <span style={{ color: '#7C3AED' }}>✓ Selected</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {plans.length === 0 && ideas.length === 0 && (
+          <div className="rpt-section-alert rpt-alert-warn"><AlertTriangle size={14} />No copilot research sessions found yet. Start an exploration in the Copilot module!</div>
+        )}
+      </div>
+    );
+  };
+
   const renderSection = (sectionKey) => {
     switch (sectionKey) {
       case 'research': return renderResearchSection();
@@ -596,26 +698,38 @@ function ReportPreviewModal({ report, onClose, onExportPDF, onExportExcel }) {
       case 'technology': return renderTechnologySection();
       case 'innovation': return renderInnovationSection();
       case 'commercialization': return renderCommercializationSection();
+      case 'copilot': return renderCopilotSection();
       default: return null;
     }
   };
 
   const isComprehensive = data.report_type === 'comprehensive';
   const sections = isComprehensive
-    ? ['research', 'funding', 'patents', 'technology', 'innovation', 'commercialization']
+    ? ['research', 'funding', 'patents', 'technology', 'innovation', 'commercialization', 'copilot']
     : [data.report_type];
 
-  const sectionLabels = { research: 'Research Intelligence', funding: 'Funding Intelligence', patents: 'Patent Landscape', technology: 'Technology Intelligence', innovation: 'Innovation Assessment', commercialization: 'Commercialization Opportunities' };
+  const sectionLabels = { research: 'Research Intelligence', funding: 'Funding Intelligence', patents: 'Patent Landscape', technology: 'Technology Intelligence', innovation: 'Innovation Assessment', commercialization: 'Commercialization Opportunities', copilot: 'Research Copilot & Innovation Blueprints' };
 
   return (
     <div className="rpt-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="rpt-modal" style={{ maxWidth: 820 }} role="dialog" aria-modal="true" aria-label="Report Preview">
-        <div className="rpt-modal-header">
+        <div className="rpt-modal-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 32, height: 32, background: '#EFF6FF', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Eye size={16} color="#1D4ED8" /></div>
-            <h2>Report Preview</h2>
+            <div>
+              <h2 style={{ margin: 0, fontSize: 16 }}>Report Preview & Intelligence Summary</h2>
+              <span style={{ fontSize: 11, color: '#64748B' }}>{report.title}</span>
+            </div>
           </div>
-          <button className="rpt-btn rpt-btn-ghost rpt-btn-sm" onClick={onClose} id="close-preview"><X size={16} /></button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button id="modal-export-pdf-top" className="rpt-btn rpt-btn-primary rpt-btn-sm" onClick={() => onExportPDF(report)} title="Download formatted PDF">
+              <FileText size={13} />Download PDF
+            </button>
+            <button id="modal-export-excel-top" className="rpt-btn rpt-btn-success rpt-btn-sm" onClick={() => onExportExcel(report)} title="Download Excel workbook (.xlsx)">
+              <FileSpreadsheet size={13} />Download Excel (.xlsx)
+            </button>
+            <button className="rpt-btn rpt-btn-ghost rpt-btn-sm" onClick={onClose} id="close-preview"><X size={16} /></button>
+          </div>
         </div>
 
         <div style={{ overflowY: 'auto', maxHeight: 'calc(90vh - 140px)' }}>
@@ -718,10 +832,10 @@ function ReportPreviewModal({ report, onClose, onExportPDF, onExportExcel }) {
 
         <div className="rpt-preview-actions">
           <button id="export-pdf-btn" className="rpt-btn rpt-btn-primary" onClick={() => onExportPDF(report)}>
-            <FileText size={14} />Generate PDF
+            <FileText size={14} />Download PDF
           </button>
           <button id="export-excel-btn" className="rpt-btn rpt-btn-success" onClick={() => onExportExcel(report)}>
-            <FileSpreadsheet size={14} />Export Excel
+            <FileSpreadsheet size={14} />Download Excel (.xlsx)
           </button>
           <button className="rpt-btn rpt-btn-secondary" onClick={onClose}>Close</button>
         </div>
@@ -825,17 +939,17 @@ export default function ReportsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [notification, setNotification] = useState(null);
 
-  const userId = user?.id;
+  const effectiveUserId = user?.id || 'demo-user-eval-01';
   const allowedTypes = getAllowedReportTypes(profile);
 
   // Load history on mount
   useEffect(() => {
-    if (userId) setHistory(getReportHistory(userId));
-  }, [userId]);
+    setHistory(getReportHistory(effectiveUserId));
+  }, [effectiveUserId]);
 
   const refreshHistory = useCallback(() => {
-    if (userId) setHistory(getReportHistory(userId));
-  }, [userId]);
+    setHistory(getReportHistory(effectiveUserId));
+  }, [effectiveUserId]);
 
   const showNotif = (msg, type = 'success') => {
     setNotification({ msg, type });
@@ -843,14 +957,13 @@ export default function ReportsPage() {
   };
 
   const handleGenerate = async (reportType, filters, config) => {
-    if (!userId) { showNotif('You must be signed in to generate reports.', 'error'); return; }
-    const record = await createReportJob(userId, profile, reportType, filters, config);
+    const record = await createReportJob(effectiveUserId, profile, reportType, filters, config);
     refreshHistory();
     setGeneratingReportId(record.id);
     setActiveTab('history');
     showNotif(`Report "${record.title}" queued for generation.`);
 
-    const result = await executeReport(userId, record.id);
+    const result = await executeReport(effectiveUserId, record.id);
     setGeneratingReportId(null);
     refreshHistory();
     if (result.success) {
@@ -861,10 +974,9 @@ export default function ReportsPage() {
   };
 
   const handleRegenerate = async (reportId) => {
-    if (!userId) return;
     setGeneratingReportId(reportId);
     refreshHistory();
-    const result = await regenerateReport(userId, reportId);
+    const result = await regenerateReport(effectiveUserId, reportId);
     setGeneratingReportId(null);
     refreshHistory();
     if (result.success) showNotif('Report regenerated successfully.');
@@ -872,101 +984,122 @@ export default function ReportsPage() {
   };
 
   const handleDelete = (reportId) => {
-    if (!userId) return;
-    deleteReport(userId, reportId);
+    deleteReport(effectiveUserId, reportId);
     refreshHistory();
     showNotif('Report deleted.');
   };
 
   const handleExportPDF = (report) => {
     if (!report?.data) { showNotif('No report data available to export.', 'error'); return; }
-    const structure = generatePDFStructure(report);
-    if (!structure) { showNotif('Could not generate PDF structure.', 'error'); return; }
-
-    // Generate a structured text-based PDF representation
-    // (In production, integrate jsPDF, pdfmake, or a backend PDF renderer)
-    const lines = [
-      '='.repeat(70),
-      `  ${structure.metadata.platform.toUpperCase()}`,
-      '='.repeat(70),
-      '',
-      `REPORT TITLE:       ${structure.metadata.title}`,
-      `REPORT TYPE:        ${structure.metadata.report_type}`,
-      `GENERATED BY:       ${structure.metadata.user_name}`,
-      `ORGANIZATION:       ${structure.metadata.organization}`,
-      `ROLE:               ${structure.metadata.user_role}`,
-      `GENERATED DATE:     ${structure.metadata.generated_at}`,
-      `ANALYSIS PERIOD:    ${structure.metadata.period}`,
-      `REPORT VERSION:     ${structure.metadata.report_version}`,
-      '',
-      '='.repeat(70),
-      '',
-    ];
-
-    structure.sections.forEach((section) => {
-      lines.push(`── ${section.title.toUpperCase()} ──`);
-      lines.push('');
-      if (section.type === 'table' && Array.isArray(section.data)) {
-        section.data.slice(0, 10).forEach((row, i) => {
-          if (typeof row === 'object') {
-            const cols = section.columns || Object.keys(row);
-            lines.push(`  ${i + 1}. ${cols.map((c) => String(row[c] ?? 'N/A')).join(' | ')}`);
-          }
-        });
-      } else if (section.type === 'summary' && section.data) {
-        Object.entries(section.data).forEach(([k, v]) => {
-          if (typeof v !== 'object') lines.push(`  ${k}: ${v ?? 'N/A'}`);
-        });
-      } else if (section.type === 'innovation_list' && Array.isArray(section.data)) {
-        section.data.slice(0, 5).forEach((a) => {
-          lines.push(`  ${a.title}`);
-          lines.push(`    Score: ${a.overall_score ?? a.innovation_score ?? 'N/A'}/100 | Domain: ${a.domain}`);
-          lines.push('');
-        });
-      } else if (section.type === 'pathways' && section.data) {
-        Object.entries(section.data).forEach(([key, p]) => {
-          lines.push(`  Pathway: ${p.title}`);
-          lines.push(`  Evidence: ${p.evidence}`);
-          lines.push('');
-        });
-      } else if (Array.isArray(section.data)) {
-        section.data.slice(0, 8).forEach((item) => {
-          if (typeof item === 'string') lines.push(`  • ${item}`);
-          else if (item?.insight) lines.push(`  [${item.module}] ${item.insight}`);
-        });
-      }
-      lines.push('');
-      lines.push('-'.repeat(70));
-      lines.push('');
-    });
-
-    lines.push('='.repeat(70));
-    lines.push('  END OF REPORT');
-    lines.push(`  Generated by Research Funding & Innovation Intelligence Platform v${REPORT_VERSION}`);
-    lines.push('='.repeat(70));
-
-    const content = lines.join('\n');
-    const filename = `${report.title.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf.txt`;
-    downloadTextFile(filename, content, 'text/plain');
-    showNotif('PDF structure exported. For a rendered PDF, connect a PDF rendering library.');
+    try {
+      const filename = exportReportToPDF(report);
+      showNotif(`Report downloaded as PDF (${filename}).`, 'success');
+    } catch (err) {
+      console.error('PDF export error:', err);
+      showNotif(`Failed to generate PDF: ${err.message}`, 'error');
+    }
   };
 
   const handleExportExcel = (report) => {
     if (!report?.data) { showNotif('No report data available to export.', 'error'); return; }
-    const sheets = generateExcelData(report);
-    if (!sheets) { showNotif('Could not generate Excel data.', 'error'); return; }
+    try {
+      const filename = exportReportToExcel(report);
+      showNotif(`Report downloaded as Excel workbook (${filename}).`, 'success');
+    } catch (err) {
+      console.error('Excel export error:', err);
+      showNotif(`Failed to generate Excel: ${err.message}`, 'error');
+    }
+  };
 
-    // Generate a multi-sheet CSV representation
-    // (In production, use SheetJS/xlsx library for proper Excel format)
-    const parts = [];
-    Object.entries(sheets).forEach(([sheetName, rows]) => {
-      parts.push(`\n\n===== SHEET: ${sheetName} =====`);
-      parts.push(arraysToCSV(rows));
-    });
+  // ── Open Summary & Quick Export Handlers from Dashboard List ──
+  const handleOpenSummary = async (type) => {
+    const existing = history.find(
+      (r) => r.report_type === type.id && r.status === 'completed' && r.data
+    );
+    if (existing) {
+      setPreviewReport(existing);
+      showNotif(`Opened summary for ${type.label}`, 'success');
+      return;
+    }
 
-    const filename = `${report.title.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
-    downloadTextFile(filename, parts.join('\n'), 'text/csv');
-    showNotif('Excel data exported as CSV. For native .xlsx format, connect SheetJS library.');
+    showNotif(`Generating live summary for ${type.label}...`);
+    try {
+      const record = await createReportJob(effectiveUserId, profile, type.id, {}, {});
+      setGeneratingReportId(record.id);
+      refreshHistory();
+      const result = await executeReport(effectiveUserId, record.id);
+      setGeneratingReportId(null);
+      refreshHistory();
+      if (result.success && result.report?.data) {
+        setPreviewReport(result.report);
+        showNotif(`Summary ready for ${type.label}!`, 'success');
+      } else {
+        showNotif(`Failed to generate summary: ${result.error || 'Unknown error'}`, 'error');
+      }
+    } catch (err) {
+      setGeneratingReportId(null);
+      showNotif(`Error generating summary: ${err.message}`, 'error');
+    }
+  };
+
+  const handleOpenAllSummaries = async () => {
+    const compType = allowedTypes.find((t) => t.id === 'comprehensive') || {
+      id: 'comprehensive',
+      label: 'Comprehensive Intelligence Report',
+    };
+    await handleOpenSummary(compType);
+  };
+
+  const handleQuickExportPDF = async (type) => {
+    let rep = history.find(
+      (r) => r.report_type === type.id && r.status === 'completed' && r.data
+    );
+    if (!rep) {
+      showNotif(`Generating ${type.label} for PDF export...`);
+      try {
+        const record = await createReportJob(effectiveUserId, profile, type.id, {}, {});
+        setGeneratingReportId(record.id);
+        const result = await executeReport(effectiveUserId, record.id);
+        setGeneratingReportId(null);
+        refreshHistory();
+        if (result.success && result.report?.data) {
+          rep = result.report;
+        }
+      } catch (err) {
+        setGeneratingReportId(null);
+        showNotif(`Error generating PDF: ${err.message}`, 'error');
+        return;
+      }
+    }
+    if (rep) {
+      handleExportPDF(rep);
+    }
+  };
+
+  const handleQuickExportExcel = async (type) => {
+    let rep = history.find(
+      (r) => r.report_type === type.id && r.status === 'completed' && r.data
+    );
+    if (!rep) {
+      showNotif(`Generating ${type.label} for Excel export...`);
+      try {
+        const record = await createReportJob(effectiveUserId, profile, type.id, {}, {});
+        setGeneratingReportId(record.id);
+        const result = await executeReport(effectiveUserId, record.id);
+        setGeneratingReportId(null);
+        refreshHistory();
+        if (result.success && result.report?.data) {
+          rep = result.report;
+        }
+      } catch (err) {
+        setGeneratingReportId(null);
+        showNotif(`Error generating Excel: ${err.message}`, 'error');
+        return;
+      }
+    }
+    if (rep) {
+      handleExportExcel(rep);
+    }
   };
 
   // Filter history
@@ -1060,13 +1193,46 @@ export default function ReportsPage() {
         {/* ── DASHBOARD TAB ── */}
         {activeTab === 'dashboard' && (
           <div>
-            <p className="rpt-section-label" style={{ marginBottom: 14 }}>
-              Available Report Types ({allowedTypes.length})
-              <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, marginLeft: 6, color: '#94A3B8', fontSize: 11 }}>— based on your role: {profile?.role || 'Researcher'}</span>
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <p className="rpt-section-label" style={{ margin: 0 }}>
+                  Available Report Types ({allowedTypes.length})
+                  <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, marginLeft: 6, color: '#94A3B8', fontSize: 11 }}>— based on your role: {profile?.role || 'Researcher'}</span>
+                </p>
+                <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748B' }}>
+                  Click <strong>"Open Summary"</strong> on any report type below to view the full intelligence report and download as PDF or Excel.
+                </p>
+              </div>
+              <button
+                id="open-all-summaries-btn"
+                className="rpt-btn rpt-btn-primary"
+                style={{
+                  background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  padding: '9px 18px',
+                  boxShadow: '0 4px 14px rgba(124, 58, 237, 0.28)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+                onClick={handleOpenAllSummaries}
+                title="Open comprehensive multi-module summary covering all platform intelligence domains"
+              >
+                <Eye size={16} />
+                <span>Open All Summaries (Executive Master Report)</span>
+              </button>
+            </div>
             <div className="rpt-types-grid">
               {allowedTypes.map((type) => (
-                <ReportTypeCard key={type.id} type={type} onSelect={() => setShowBuilder(true)} />
+                <ReportTypeCard
+                  key={type.id}
+                  type={type}
+                  onOpenSummary={handleOpenSummary}
+                  onQuickExportPDF={handleQuickExportPDF}
+                  onQuickExportExcel={handleQuickExportExcel}
+                  onSelect={() => setShowBuilder(true)}
+                />
               ))}
             </div>
 
